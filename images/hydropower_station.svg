@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#005F56" opacity="0.2"/>
+  
+  <!-- 山脉 -->
+  <path d="M0,250 Q100,150 200,200 Q300,250 400,180 Q500,120 600,200 Q700,280 800,250 L800,600 L0,600 Z" fill="#005F56" opacity="0.5"/>
+  <path d="M0,300 Q150,200 300,250 Q450,300 600,220 Q750,150 800,300 L800,600 L0,600 Z" fill="#008679" opacity="0.4"/>
+  
+  <!-- 水面 -->
+  <path d="M0,350 Q100,370 200,360 Q300,350 400,370 Q500,390 600,360 Q700,330 800,350 L800,600 L0,600 Z" fill="#00A896" opacity="0.6"/>
+  
+  <!-- 水电站主体 -->
+  <rect x="300" y="280" width="200" height="120" fill="#005F56"/>
+  <rect x="320" y="300" width="40" height="60" fill="#00A896"/>
+  <rect x="380" y="300" width="40" height="60" fill="#00A896"/>
+  <rect x="440" y="300" width="40" height="60" fill="#00A896"/>
+  
+  <!-- 水电站顶部 -->
+  <polygon points="280,280 400,220 520,280" fill="#005F56"/>
+  
+  <!-- 水流 -->
+  <path d="M320,400 L320,450 Q340,470 360,450 L360,400 Z" fill="#00A896" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.4;0.8" dur="3s" repeatCount="indefinite" />
+  </path>
+  <path d="M380,400 L380,450 Q400,470 420,450 L420,400 Z" fill="#00A896" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2.5s" repeatCount="indefinite" />
+  </path>
+  <path d="M440,400 L440,450 Q460,470 480,450 L480,400 Z" fill="#00A896" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.4;0.8" dur="3.5s" repeatCount="indefinite" />
+  </path>
+  
+  <!-- 电线杆 -->
+  <line x1="550" y1="280" x2="550" y2="200" stroke="#4A5568" stroke-width="5"/>
+  <line x1="550" y1="200" x2="650" y2="200" stroke="#4A5568" stroke-width="3"/>
+  <line x1="550" y1="220" x2="650" y2="220" stroke="#4A5568" stroke-width="3"/>
+  
+  <!-- 云朵 -->
+  <ellipse cx="150" cy="100" rx="50" ry="30" fill="white" opacity="0.7"/>
+  <ellipse cx="180" cy="90" rx="40" ry="25" fill="white" opacity="0.7"/>
+  <ellipse cx="120" cy="90" rx="40" ry="25" fill="white" opacity="0.7"/>
+  
+  <ellipse cx="600" cy="150" rx="60" ry="35" fill="white" opacity="0.7"/>
+  <ellipse cx="640" cy="140" rx="50" ry="30" fill="white" opacity="0.7"/>
+  <ellipse cx="560" cy="140" rx="50" ry="30" fill="white" opacity="0.7"/>
+</svg>

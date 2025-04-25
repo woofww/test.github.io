@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>征迁补偿系统 - 通知中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* 侧边栏收缩样式 */
+    .sidebar.collapsed {
+        width: 5rem;
+    }
+    .sidebar.collapsed .sidebar-toggle i {
+        transform: rotate(180deg);
+    }
+    .main-content.expanded {
+        margin-left: 0;
+    }
+    .sidebar-toggle {
+        transition: transform 0.3s;
+    }
+    .sidebar nav a {
+        white-space: nowrap;
+    }
+</style>
+<body class="bg-neutral-light min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <div class="bg-primary-dark text-white w-64 flex-shrink-0 hidden md:block transition-all duration-300 sidebar" id="sidebar">
+            <div class="p-4 border-b border-primary flex justify-between items-center">
+                <h1 class="text-xl font-bold">征迁补偿系统</h1>
+                <button class="sidebar-toggle text-white focus:outline-none">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <a href="dashboard.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>控制台</span>
+                </a>
+                <a href="projects.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    <span>项目管理</span>
+                </a>
+                <a href="compensation.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span>补偿标准</span>
+                </a>
+                <a href="applications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>申请处理</span>
+                </a>
+                <a href="reports.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>统计报表</span>
+                </a>
+                <a href="alerts.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <span>预警管理</span>
+                </a>
+                <a href="notifications.html" class="flex items-center py-3 px-4 bg-primary">
+                    <i class="fas fa-bell mr-3"></i>
+                    <span>通知中心</span>
+                </a>
+                <a href="settings.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden main-content transition-all duration-300">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-neutral-dark mr-4 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">通知中心</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative mr-4">
+                            <button class="text-neutral-dark hover:text-primary focus:outline-none">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                            </button>
+                        </div>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-neutral-dark hover:text-primary focus:outline-none">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+                                <span class="ml-2 hidden md:block">管理员</span>
+                                <i class="fas fa-chevron-down ml-1 hidden md:block"></i>
+                            </button>
+                            <!-- 用户下拉菜单 -->
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-100" style="display: none;">
+                                <!-- 用户状态信息 -->
+                                <div class="px-4 py-2 border-b border-neutral">
+                                    <p class="text-sm font-medium text-neutral-dark">管理员</p>
+                                    <p class="text-xs text-neutral">admin@example.com</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span>
+                                        <span class="text-xs text-green-500">在线</span>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-user mr-2"></i> 个人资料
+                                </a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-cog mr-2"></i> 系统设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-bell mr-2"></i> 通知设置
+                                </a>
+                                <div class="border-t border-neutral mt-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-500 hover:bg-neutral-light transition-colors duration-150">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- 操作栏 -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <h2 class="text-xl font-semibold text-neutral-dark">通知列表</h2>
+                        <span class="ml-2 px-2 py-1 text-xs rounded-full bg-red-500 text-white">5 条未读</span>
+                    </div>
+                    <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                        <div class="relative">
+                            <input type="text" placeholder="搜索通知..." class="w-full md:w-64 pl-10 pr-4 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-neutral"></i>
+                            </div>
+                        </div>
+                        <button class="flex items-center justify-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <i class="fas fa-check-double mr-2"></i>
+                            <span>标记全部已读</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 筛选器 -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center">
+                            <label for="status-filter" class="block text-sm font-medium text-neutral-dark mr-2">状态:</label>
+                            <select id="status-filter" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="all">全部</option>
+                                <option value="unread" selected>未读</option>
+                                <option value="read">已读</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <label for="type-filter" class="block text-sm font-medium text-neutral-dark mr-2">类型:</label>
+                            <select id="type-filter" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="all">全部类型</option>
+                                <option value="application">申请通知</option>
+                                <option value="project">项目通知</option>
+                                <option value="system">系统通知</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <label for="date-filter" class="block text-sm font-medium text-neutral-dark mr-2">日期:</label>
+                            <select id="date-filter" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="all">全部时间</option>
+                                <option value="today">今天</option>
+                                <option value="week">本周</option>
+                                <option value="month">本月</option>
+                            </select>
+                        </div>
+                        <button class="ml-auto text-sm text-primary hover:text-primary-light focus:outline-none">
+                            <i class="fas fa-redo-alt mr-1"></i>
+                            <span>重置筛选器</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 通知列表 -->
+                <div class="space-y-4 mb-6" x-data="{ selectedNotifications: [] }">
+                    <!-- 未读通知 - 申请状态变更 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-red-500 transition-all duration-300 hover:shadow-md" x-data="{isRead: false}" :class="{'border-l-4 border-red-500': !isRead, 'border-l-0': isRead}">
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center text-red-500">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mr-2" @click.stop="$event.target.checked ? selectedNotifications.push('APP-2023-001') : selectedNotifications = selectedNotifications.filter(id => id !== 'APP-2023-001')">
+                                            <h3 class="text-base font-medium text-neutral-dark">申请状态变更</h3>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <button @click="isRead = !isRead" class="text-xs text-neutral hover:text-primary transition-colors duration-200">
+                                                <i class="fas" :class="isRead ? 'fa-envelope' : 'fa-envelope-open'"></i>
+                                                <span x-text="isRead ? '标为未读' : '标为已读'"></span>
+                                            </button>
+                                            <span class="text-xs text-neutral">10分钟前</span>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-neutral-dark mt-1">您的申请 <span class="font-medium">APP-2023-001</span> 已被批准，请查看详情。</p>
+                                    <div class="mt-2 flex items-center">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-600 mr-2">已批准</span>
+                                        <a href="applications.html" class="text-sm text-primary hover:text-primary-light">查看详情</a>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 ml-3 flex flex-col items-center">
+                                    <button class="text-neutral hover:text-primary focus:outline-none">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="text-neutral hover:text-red-500 focus:outline-none mt-2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 未读通知 - 项目进度更新 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-red-500">
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-medium text-neutral-dark">项目进度更新</h3>
+                                        <span class="text-xs text-neutral">1小时前</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-dark mt-1">项目 <span class="font-medium">东湖新区征迁</span> 已完成第一阶段，进度更新至25%。</p>
+                                    <div class="mt-2">
+                                        <a href="projects.html" class="text-sm text-primary hover:text-primary-light">查看项目</a>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 ml-3 flex flex-col items-center">
+                                    <button class="text-neutral hover:text-primary focus:outline-none">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="text-neutral hover:text-red-500 focus:outline-none mt-2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 未读通知 - 新申请提交 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-red-500">
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="h-10 w-10 rounded-full bg-accent bg-opacity-10 flex items-center justify-center text-accent">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-medium text-neutral-dark">新申请提交</h3>
+                                        <span class="text-xs text-neutral">3小时前</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-dark mt-1"><span class="font-medium">李四</span> 提交了新的补偿申请 <span class="font-medium">APP-2023-002</span>，请及时处理。</p>
+                                    <div class="mt-2">
+                                        <a href="applications.html" class="text-sm text-primary hover:text-primary-light">查看申请</a>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 ml-3 flex flex-col items-center">
+                                    <button class="text-neutral hover:text-primary focus:outline-none">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="text-neutral hover:text-red-500 focus:outline-none mt-2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 未读通知 - 系统更新 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-red-500">
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500">
+                                        <i class="fas fa-cog"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-medium text-neutral-dark">系统更新</h3>
+                                        <span class="text-xs text-neutral">昨天 14:30</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-dark mt-1">系统已更新至v2.3.0版本，新增了报表导出功能和批量处理申请功能。</p>
+                                    <div class="mt-2">
+                                        <a href="#" class="text-sm text-primary hover:text-primary-light">查看更新日志</a>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 ml-3 flex flex-col items-center">
+                                    <button class="text-neutral hover:text-primary focus:outline-none">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="text-neutral hover:text-red-500 focus:outline-none mt-2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 未读通知 - 补偿标准更新 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden border-l-4 border-red-500">
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center text-green-500">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-medium text-neutral-dark">补偿标准更新</h3>
+                                        <span class="text-xs text-neutral">昨天 10:15</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-dark mt-1">东湖新区住宅补偿标准已更新，单价从8,200元/㎡调整为8,500元/㎡。</p>
+                                    <div class="mt-2">
+                                        <a href="compensation.html" class="text-sm text-primary hover:text-primary-light">查看详情</a>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 ml-3 flex flex-col items-center">
+                                    <button class="text-neutral hover:text-primary focus:outline-none">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="text-neutral hover:text-red-500 focus:outline-none mt-2">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已读通知 - 项目创建 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500">
+                                        <i class="fas fa-folder-plus"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-medium text-neutral-dark">新项目创建</h3>
+                                        <span class="text-xs text-neutral">2天前</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-dark mt-1">新项目 <span class="font-medium">"东湖新区征迁"</span> 已创建，您被指定为项目负责人。</p>
+                                    <div class="mt-2">
+                                        <a href="projects.html" class="text-sm text-primary hover:text-primary-light">查看项目</a>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 ml-3 flex flex-col items-center">
+                                    <button class="text-neutral hover:text-red-500 focus:outline-none">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已读通知 - 申请审核提醒 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="p-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0 mr-3">
+                                    <div class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-base font-medium text-neutral-dark">申请审核提醒</h3>
+                                        <span class="text-xs text-neutral">3天前</span>
+                                    </div>
+                                    <p class="text-sm text-neutral-dark mt-1">有5个申请待审核，其中2个已超过处理时限，请尽快处理。</p>
+                                    <div class="mt-2">
+                                        <a href="applications.html" class="text-sm text-primary hover:text-primary-light">查看申请</a>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 ml-3 flex flex-col items-center">
+                                    <button class="text-neutral hover:text-red-500 focus:outline-none">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分页 -->
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-neutral-dark">
+                        显示 <span class="font-medium">1</span> 到 <span class="font-medium">7</span> 共 <span class="font-medium">23</span> 条通知
+                    </div>
+                    <div class="flex space-x-1">
+                        <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50" disabled>
+                            上一页
+                        </button>
+                        <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            1
+                        </button>
+                        <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            2
+                        </button>
+                        <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            3
+                        </button>
+                        <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            下一页
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // 标记已读功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const markReadButtons = document.querySelectorAll('.fas.fa-check').forEach(button => {
+                button.parentElement.addEventListener('click', function() {
+                    const notificationItem = this.closest('.border-l-4');
+                    if (notificationItem) {
+                        notificationItem.classList.remove('border-l-4', 'border-red-500');
+                        this.style.display = 'none';
+                        
+                        // 更新未读数量
+                        const unreadBadge = document.querySelector('.rounded-full.bg-red-500');
+                        if (unreadBadge) {
+                            const currentCount = parseInt(unreadBadge.textContent);
+                            if (currentCount > 1) {
+                                unreadBadge.textContent = (currentCount - 1) + ' 条未读';
+                            } else {
+                                unreadBadge.textContent = '0 条未读';
+                                unreadBadge.classList.remove('bg-red-500');
+                                unreadBadge.classList.add('bg-neutral');
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // 删除通知功能
+            document.querySelectorAll('.fas.fa-trash-alt').forEach(button => {
+                button.parentElement.addEventListener('click', function() {
+                    const notificationItem = this.closest('.bg-white.rounded-lg');
+                    if (notificationItem) {
+                        notificationItem.style.height = notificationItem.offsetHeight + 'px';
+                        notificationItem.style.transition = 'all 0.3s ease';
+                        setTimeout(() => {
+                            notificationItem.style.height = '0';
+                            notificationItem.style.opacity = '0';
+                            notificationItem.style.marginBottom = '0';
+                            notificationItem.style.paddingTop = '0';
+                            notificationItem.style.paddingBottom = '0';
+                            notificationItem.style.overflow = 'hidden';
+                        }, 10);
+                        setTimeout(() => {
+                            notificationItem.remove();
+                        }, 300);
+                        
+                        // 如果是未读通知，更新未读数量
+                        if (notificationItem.classList.contains('border-l-4')) {
+                            const unreadBadge = document.querySelector('.rounded-full.bg-red-500');
+                            if (unreadBadge) {
+                                const currentCount = parseInt(unreadBadge.textContent);
+                                if (currentCount > 1) {
+                                    unreadBadge.textContent = (currentCount - 1) + ' 条未读';
+                                } else {
+                                    unreadBadge.textContent = '0 条未读';
+                                    unreadBadge.classList.remove('bg-red-500');
+                                    unreadBadge.classList.add('bg-neutral');
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // 标记全部已读功能
+            document.querySelector('button:has(.fas.fa-check-double)').addEventListener('click', function() {
+                document.querySelectorAll('.border-l-4.border-red-500').forEach(item => {
+                    item.classList.remove('border-l-4', 'border-red-500');
+                    item.querySelector('.fas.fa-check').parentElement.style.display = 'none';
+                });
+                
+                // 更新未读数量
+                const unreadBadge = document.querySelector('.rounded-full.bg-red-500');
+                if (unreadBadge) {
+                    unreadBadge.textContent = '0 条未读';
+                    unreadBadge.classList.remove('bg-red-500');
+                    unreadBadge.classList.add('bg-neutral');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

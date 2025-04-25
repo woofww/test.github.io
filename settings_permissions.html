@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>征迁补偿系统 - 权限设置</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* Custom styles if needed */
+</style>
+<body class="bg-neutral-light min-h-screen" x-data="{ showModal: false }">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="bg-primary-dark text-white w-64 flex-shrink-0 hidden md:block sidebar" id="sidebar">
+            <div class="p-4 border-b border-primary">
+                <h1 class="text-xl font-bold">征迁补偿系统</h1>
+            </div>
+            <nav class="mt-5">
+                <a href="dashboard.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>控制台</span>
+                </a>
+                <a href="projects.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    <span>项目管理</span>
+                </a>
+                <a href="compensation.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span>补偿标准</span>
+                </a>
+                <a href="applications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>申请处理</span>
+                </a>
+                <a href="reports.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>统计报表</span>
+                </a>
+                <a href="alerts.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <span>预警管理</span>
+                </a>
+                <a href="notifications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-bell mr-3"></i>
+                    <span>通知中心</span>
+                </a>
+                <a href="settings.html" class="flex items-center py-3 px-4 bg-primary">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden main-content transition-all duration-300">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-neutral-dark mr-4 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">权限设置</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative mr-4">
+                            <button class="text-neutral-dark hover:text-primary focus:outline-none">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                            </button>
+                        </div>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-neutral-dark hover:text-primary focus:outline-none">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+                                <span class="ml-2 hidden md:block">管理员</span>
+                                <i class="fas fa-chevron-down ml-1 hidden md:block"></i>
+                            </button>
+                            <!-- 用户下拉菜单 -->
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-100" style="display: none;">
+                                <!-- 用户状态信息 -->
+                                <div class="px-4 py-2 border-b border-neutral">
+                                    <p class="text-sm font-medium text-neutral-dark">管理员</p>
+                                    <p class="text-xs text-neutral">admin@example.com</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span>
+                                        <span class="text-xs text-green-500">在线</span>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-user mr-2"></i> 个人资料
+                                </a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-cog mr-2"></i> 系统设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-bell mr-2"></i> 通知设置
+                                </a>
+                                <div class="border-t border-neutral mt-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-500 hover:bg-neutral-light transition-colors duration-150">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- 设置导航 -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="settings_basic.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>基本设置</span>
+                        </a>
+                        <a href="settings_users.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>用户管理</span>
+                        </a>
+                        <a href="settings_permissions.html" class="px-4 py-2 rounded-md bg-primary text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>权限设置</span>
+                        </a>
+                        <a href="settings_notifications.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>通知设置</span>
+                        </a>
+                        <a href="settings_alerts.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>预警通知管理</span>
+                        </a>
+                        <a href="settings_logs.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>系统日志</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 权限设置内容 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">角色管理</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="text-sm text-neutral-dark">管理系统角色，为不同角色分配权限</div>
+                            <button class="px-3 py-1.5 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-plus mr-1"></i> 添加角色
+                            </button>
+                        </div>
+                        
+                        <!-- 角色列表 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-neutral">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            角色名称
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            描述
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            用户数
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            操作
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-neutral">
+                                    <!-- 角色1 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">超级管理员</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm text-neutral-dark">拥有系统所有权限，可以管理所有功能和数据</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                            1
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="text-red-500 hover:text-red-700 mr-3"><i class="fas fa-trash-alt"></i></a>
+                                            <a href="#" class="text-primary hover:text-primary-dark"><i class="fas fa-key"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- 角色2 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">项目经理</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm text-neutral-dark">负责项目管理，可以查看和编辑项目相关信息</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                            3
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="text-red-500 hover:text-red-700 mr-3"><i class="fas fa-trash-alt"></i></a>
+                                            <a href="#" class="text-primary hover:text-primary-dark"><i class="fas fa-key"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- 角色3 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">财务主管</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm text-neutral-dark">负责财务管理，可以查看和编辑财务相关信息</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                            2
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="text-red-500 hover:text-red-700 mr-3"><i class="fas fa-trash-alt"></i></a>
+                                            <a href="#" class="text-primary hover:text-primary-dark"><i class="fas fa-key"></i></a>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- 角色4 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">普通用户</div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-sm text-neutral-dark">基本查看权限，无编辑和管理权限</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                            5
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-edit"></i></a>
+                                            <a href="#" class="text-red-500 hover:text-red-700 mr-3"><i class="fas fa-trash-alt"></i></a>
+                                            <a href="#" class="text-primary hover:text-primary-dark"><i class="fas fa-key"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 权限分配 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">权限分配</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-4">
+                            <label for="role-select" class="block text-sm font-medium text-neutral-dark mb-2">选择角色</label>
+                            <select id="role-select" class="w-full md:w-64 px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                <option value="admin">超级管理员</option>
+                                <option value="manager" selected>项目经理</option>
+                                <option value="finance">财务主管</option>
+                                <option value="user">普通用户</option>
+                            </select>
+                        </div>
+                        
+                        <div class="border border-neutral rounded-lg p-4 mb-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-medium text-neutral-dark">项目经理权限</h4>
+                                <button class="text-primary hover:text-primary-light text-sm"><i class="fas fa-save mr-1"></i>保存更改</button>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- 项目管理权限 -->
+                                <div class="border border-neutral rounded p-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-medium text-neutral-dark">项目管理</span>
+                                    </div>
+                                    <div class="space-y-2 pl-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="project-view" checked class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="project-view" class="ml-2 block text-sm text-neutral-dark">查看项目</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="project-create" checked class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="project-create" class="ml-2 block text-sm text-neutral-dark">创建项目</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="project-edit" checked class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="project-edit" class="ml-2 block text-sm text-neutral-dark">编辑项目</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="project-delete" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="project-delete" class="ml-2 block text-sm text-neutral-dark">删除项目</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 补偿管理权限 -->
+                                <div class="border border-neutral rounded p-3">
+                                      <div class="flex items-center justify-between mb-2">
+                                          <span class="font-medium text-neutral-dark">补偿管理</span>
+                                      </div>
+                                    <div class="space-y-2 pl-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="compensation-view" checked class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="compensation-view" class="ml-2 block text-sm text-neutral-dark">查看补偿</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="compensation-create" checked class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="compensation-create" class="ml-2 block text-sm text-neutral-dark">创建补偿</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="compensation-edit" checked class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="compensation-edit" class="ml-2 block text-sm text-neutral-dark">编辑补偿</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="compensation-approve" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="compensation-approve" class="ml-2 block text-sm text-neutral-dark">审批补偿</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                  <!-- 报表统计权限 -->
+                                  <div class="border border-neutral rounded p-3">
+                                      <div class="flex items-center justify-between mb-2">
+                                          <span class="font-medium text-neutral-dark">报表统计</span>
+                                      </div>
+                                      <div class="space-y-2 pl-2">
+                                          <div class="flex items-center">
+                                              <input type="checkbox" id="report-view" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded" checked>
+                                              <label for="report-view" class="ml-2 block text-sm text-neutral-dark">查看报表</label>
+                                          </div>
+                                          <div class="flex items-center">
+                                              <input type="checkbox" id="report-export" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded" checked>
+                                              <label for="report-export" class="ml-2 block text-sm text-neutral-dark">导出报表</label>
+                                          </div>
+                                      </div>
+                                  </div>
+                                
+                                  <!-- 用户管理权限 -->
+                                  <div class="border border-neutral rounded p-3">
+                                      <div class="flex items-center justify-between mb-2">
+                                          <span class="font-medium text-neutral-dark">用户管理</span>
+                                      </div>
+                                      <div class="space-y-2 pl-2">
+                                          <div class="flex items-center">
+                                              <input type="checkbox" id="user-view" checked class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                              <label for="user-view" class="ml-2 block text-sm text-neutral-dark">查看用户列表</label>
+                                          </div>
+                                          <div class="flex items-center">
+                                              <input type="checkbox" id="user-add" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                              <label for="user-add" class="ml-2 block text-sm text-neutral-dark">添加用户</label>
+                                          </div>
+                                          <div class="flex items-center">
+                                              <input type="checkbox" id="user-edit" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                              <label for="user-edit" class="ml-2 block text-sm text-neutral-dark">编辑用户信息</label>
+                                          </div>
+                                          <div class="flex items-center">
+                                              <input type="checkbox" id="user-delete" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                              <label for="user-delete" class="ml-2 block text-sm text-neutral-dark">删除用户</label>
+                                          </div>
+                                      </div>
+                                  </div>
+                                
+                                <!-- 系统设置权限 -->
+                                <div class="border border-neutral rounded p-3">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-medium text-neutral-dark">系统设置</span>
+                                    </div>
+                                    <div class="space-y-2 pl-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="system-basic" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="system-basic" class="ml-2 block text-sm text-neutral-dark">基础设置</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="system-alert" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="system-alert" class="ml-2 block text-sm text-neutral-dark">预警设置</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="system-log" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                                            <label for="system-log" class="ml-2 block text-sm text-neutral-dark">日志查看</label>
+                                        </div>
+                                    </div>
+                                </div>

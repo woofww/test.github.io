@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>征迁补偿系统 - 统计报表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<style>
+    .sidebar nav a {
+        white-space: nowrap;
+    }
+</style>
+<body class="bg-neutral-light min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <div class="bg-primary-dark text-white w-64 flex-shrink-0 hidden md:block transition-all duration-300 sidebar" id="sidebar">
+            <div class="p-4 border-b border-primary flex justify-between items-center">
+                <h1 class="text-xl font-bold">征迁补偿系统</h1>
+                <button class="sidebar-toggle text-white focus:outline-none">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <a href="dashboard.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>控制台</span>
+                </a>
+                <a href="projects.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    <span>项目管理</span>
+                </a>
+                <a href="compensation.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span>补偿标准</span>
+                </a>
+                <a href="applications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>申请处理</span>
+                </a>
+                <a href="reports.html" class="flex items-center py-3 px-4 bg-primary">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>统计报表</span>
+                </a>
+                <a href="alerts.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <span>预警管理</span>
+                </a>
+                <a href="notifications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-bell mr-3"></i>
+                    <span>通知中心</span>
+                </a>
+                <a href="settings.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-neutral-dark mr-4 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">统计报表</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative mr-4">
+                            <button class="text-neutral-dark hover:text-primary focus:outline-none">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                            </button>
+                        </div>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-neutral-dark hover:text-primary focus:outline-none">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+                                <span class="ml-2 hidden md:block">管理员</span>
+                                <i class="fas fa-chevron-down ml-1 hidden md:block"></i>
+                            </button>
+                            <!-- 用户下拉菜单 -->
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-100" style="display: none;">
+                                <!-- 用户状态信息 -->
+                                <div class="px-4 py-2 border-b border-neutral">
+                                    <p class="text-sm font-medium text-neutral-dark">管理员</p>
+                                    <p class="text-xs text-neutral">admin@example.com</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span>
+                                        <span class="text-xs text-green-500">在线</span>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-user mr-2"></i> 个人资料
+                                </a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-cog mr-2"></i> 系统设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-bell mr-2"></i> 通知设置
+                                </a>
+                                <div class="border-t border-neutral mt-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-500 hover:bg-neutral-light transition-colors duration-150">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- 报表筛选器 -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center">
+                            <label for="report-type" class="block text-sm font-medium text-neutral-dark mr-2">报表类型:</label>
+                            <select id="report-type" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="project">项目统计</option>
+                                <option value="compensation">补偿金额</option>
+                                <option value="application">申请处理</option>
+                                <option value="region">区域分析</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <label for="project-filter" class="block text-sm font-medium text-neutral-dark mr-2">项目:</label>
+                            <select id="project-filter" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="all">全部项目</option>
+                                <option value="east-lake">东湖新区征迁</option>
+                                <option value="west-city">西城区改造</option>
+                                <option value="south-lake">南湖公园扩建</option>
+                                <option value="north-road">北区道路拓宽</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <label for="date-range" class="block text-sm font-medium text-neutral-dark mr-2">时间范围:</label>
+                            <select id="date-range" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="month">本月</option>
+                                <option value="quarter">本季度</option>
+                                <option value="year">本年度</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center ml-auto">
+                            <button class="flex items-center justify-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150 mr-2">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                <span>刷新数据</span>
+                            </button>
+                            <button class="flex items-center justify-center px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                                <i class="fas fa-download mr-2"></i>
+                                <span>导出报表</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据概览卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-project-diagram text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-neutral-dark">项目总数</h3>
+                                <p class="text-2xl font-semibold text-neutral-dark">12</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-green-500 text-sm font-medium">
+                                    <i class="fas fa-arrow-up"></i> 8%
+                                </span>
+                                <span class="text-neutral text-sm ml-2">较上月</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-accent bg-opacity-10 text-accent">
+                                <i class="fas fa-file-alt text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-neutral-dark">申请总数</h3>
+                                <p class="text-2xl font-semibold text-neutral-dark">256</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-green-500 text-sm font-medium">
+                                    <i class="fas fa-arrow-up"></i> 15%
+                                </span>
+                                <span class="text-neutral text-sm ml-2">较上月</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-accent-secondary bg-opacity-10 text-accent-secondary">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-neutral-dark">已完成补偿</h3>
+                                <p class="text-2xl font-semibold text-neutral-dark">156</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-green-500 text-sm font-medium">
+                                    <i class="fas fa-arrow-up"></i> 24%
+                                </span>
+                                <span class="text-neutral text-sm ml-2">较上月</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-primary-light bg-opacity-10 text-primary-light">
+                                <i class="fas fa-yen-sign text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-sm font-medium text-neutral-dark">补偿总额</h3>
+                                <p class="text-2xl font-semibold text-neutral-dark">¥3,256,890</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center">
+                                <span class="text-green-500 text-sm font-medium">
+                                    <i class="fas fa-arrow-up"></i> 18%
+                                </span>
+                                <span class="text-neutral text-sm ml-2">较上季度</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- 项目进度图表 -->
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-neutral">
+                            <h3 class="text-lg font-medium text-neutral-dark">项目进度统计</h3>
+                        </div>
+                        <div class="p-4 relative" x-data="{ tooltip: false, tooltipData: {}, tooltipX: 0, tooltipY: 0 }">
+                            <canvas id="projectProgressChart" height="250"></canvas>
+                            <!-- 数据点悬停提示 -->
+                            <div x-show="tooltip" x-transition.opacity class="absolute bg-white border border-neutral rounded-md shadow-md p-2 z-10 transform -translate-x-1/2 pointer-events-none" :style="`left: ${tooltipX}px; top: ${tooltipY - 10}px;`" style="display: none;">
+                                <div class="text-sm font-medium text-neutral-dark" x-text="tooltipData.label"></div>
+                                <div class="text-xs text-neutral">完成率: <span class="font-medium text-primary" x-text="tooltipData.value + '%'"></span></div>
+                                <div class="text-xs text-neutral">更新时间: <span x-text="tooltipData.date"></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 补偿金额分布图表 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-neutral-dark">补偿金额分布</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-sm text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-expand-alt"></i>
+                                </button>
+                                <button class="text-sm text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="compensationDistributionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 申请处理状态图表 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-neutral-dark">申请处理状态</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-sm text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-expand-alt"></i>
+                                </button>
+                                <button class="text-sm text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="applicationStatusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 月度趋势图表 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-neutral-dark">月度趋势</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-sm text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-expand-alt"></i>
+                                </button>
+                                <button class="text-sm text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="monthlyTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 详细数据表格 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-neutral">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-neutral-dark">详细数据</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-download mr-1"></i>
+                                    <span>导出</span>
+                                </button>
+                                <button class="text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-print mr-1"></i>
+                                    <span>打印</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-neutral">
+                            <thead>
+                                <tr class="bg-neutral-light">
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">项目名称</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">申请数量</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">已完成</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">补偿金额</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">完成率</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-neutral">
+                                <!-- 项目1 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-neutral-dark">东湖新区征迁</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">78</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">45</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">¥1,256,890</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div>
+                                            <div class="flex items-center">
+                                                <div class="text-sm text-neutral-dark mr-2">58%</div>
+                                                <div class="w-24 bg-neutral rounded-full h-2">
+                                                    <div class="bg-primary h-2 rounded-full" style="width: 58%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-primary-light">查看详情</a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 项目2 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-neutral-dark">西城区改造</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">65</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">42</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">¥980,500</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div>
+                                            <div class="flex items-center">
+                                                <div class="text-sm text-neutral-dark mr-2">65%</div>
+                                                <div class="w-24 bg-neutral rounded-full h-2">
+                                                    <div class="bg-primary h-2 rounded-full" style="width: 65%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-primary-light">查看详情</a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 项目3 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-neutral-dark">南湖公园扩建</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">52</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">38</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">¥720,400</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div>
+                                            <div class="flex items-center">
+                                                <div class="text-sm text-neutral-dark mr-2">73%</div>
+                                                <div class="w-24 bg-neutral rounded-full h-2">
+                                                    <div class="bg-primary h-2 rounded-full" style="width: 73%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-primary-light">查看详情</a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 项目4 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-neutral-dark">北区道路拓宽</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">61</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">31</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">¥299,100</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div>
+                                            <div class="flex items-center">
+                                                <div class="text-sm text-neutral-dark mr-2">51%</div>
+                                                <div class="w-24 bg-neutral rounded-full h-2">
+                                                    <div class="bg-primary h-2 rounded-full" style="width: 51%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-primary hover:text-primary-light">查看详情</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-4 border-t border-neutral">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-neutral-dark">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">4</span> 共 <span class="font-medium">12</span> 条记录
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50" disabled>
+                                    上一页
+                                </button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                    1
+                                </button>
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    2
+                                </button>
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    3
+                                </button>
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    下一页
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 图表初始化脚本 -->
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 项目进度图表
+            const projectProgressCtx = document.getElementById('projectProgressChart');
+            if (projectProgressCtx) {
+                const projectProgressChart = new Chart(projectProgressCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['东湖新区征迁', '西城区改造', '南湖公园扩建', '北区道路拓宽'],
+                    datasets: [{
+                        label: '完成率',
+                        data: [58, 65, 73, 51],
+                        backgroundColor: '#008679',
+                        borderColor: '#008679',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            }
+        });
+
+            // 补偿金额分布图表
+            const compensationDistributionCtx = document.getElementById('compensationDistributionChart');
+            if (compensationDistributionCtx) {
+                const compensationDistributionChart = new Chart(compensationDistributionCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['房屋补偿', '土地补偿', '附属物补偿', '搬迁补助', '过渡补助', '奖励政策'],
+                    datasets: [{
+                        data: [35, 25, 15, 10, 10, 5],
+                        backgroundColor: [
+                            '#008679',
+                            '#00A896',
+                            '#005F56',
+                            '#F39C12',
+                            '#3498DB',
+                            '#9B59B6'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+            }
+
+            // 申请处理状态图表
+            const applicationStatusCtx = document.getElementById('applicationStatusChart');
+            if (applicationStatusCtx) {
+                const applicationStatusChart = new Chart(applicationStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['已完成', '处理中', '待审核', '已拒绝'],
+                    datasets: [{
+                        data: [156, 64, 28, 8],
+                        backgroundColor: [
+                            '#008679',
+                            '#F39C12',
+                            '#3498DB',
+                            '#E74C3C'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+            }
+
+            // 月度趋势图表
+            const monthlyTrendCtx = document.getElementById('monthlyTrendChart');
+            if (monthlyTrendCtx) {
+                const monthlyTrendChart = new Chart(monthlyTrendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '申请数量',
+                        data: [35, 42, 48, 53, 60, 68],
+                        borderColor: '#F39C12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: '完成数量',
+                        data: [20, 25, 30, 35, 42, 48],
+                        borderColor: '#008679',
+                        backgroundColor: 'rgba(0, 134, 121, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            }
+    </script>
+</body>
+</html>

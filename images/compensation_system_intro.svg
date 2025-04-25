@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <!-- 背景 -->
+  <rect width="600" height="400" fill="#f5f7f7" rx="10" ry="10"/>
+  
+  <!-- 标题 -->
+  <text x="300" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#008679">智慧征迁系统介绍</text>
+  
+  <!-- 流程图 -->
+  <g transform="translate(300, 200)">
+    <!-- 流程步骤 -->
+    <g>
+      <!-- 步骤1：项目规划 -->
+      <g transform="translate(-225, 0)">
+        <rect x="-50" y="-30" width="100" height="60" fill="#008679" rx="5" ry="5"/>
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">项目规划</text>
+        <text x="0" y="20" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">制定方案</text>
+      </g>
+      
+      <!-- 步骤2：征地拆迁 -->
+      <g transform="translate(-75, 0)">
+        <rect x="-50" y="-30" width="100" height="60" fill="#00A896" rx="5" ry="5"/>
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">征地拆迁</text>
+        <text x="0" y="20" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">调查评估</text>
+      </g>
+      
+      <!-- 步骤3：补偿计算 -->
+      <g transform="translate(75, 0)">
+        <rect x="-50" y="-30" width="100" height="60" fill="#00A896" rx="5" ry="5"/>
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">补偿计算</text>
+        <text x="0" y="20" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">标准执行</text>
+      </g>
+      
+      <!-- 步骤4：资金发放 -->
+      <g transform="translate(225, 0)">
+        <rect x="-50" y="-30" width="100" height="60" fill="#008679" rx="5" ry="5"/>
+        <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">资金发放</text>
+        <text x="0" y="20" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="white">监督管理</text>
+      </g>
+    </g>
+    
+    <!-- 连接箭头 -->
+    <g stroke="#4A5568" stroke-width="2" fill="none">
+      <path d="M-175,0 L-125,0" marker-end="url(#arrowhead)"/>
+      <path d="M-25,0 L25,0" marker-end="url(#arrowhead)"/>
+      <path d="M125,0 L175,0" marker-end="url(#arrowhead)"/>
+    </g>
+    
+    <!-- 箭头标记定义 -->
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#4A5568"/>
+      </marker>
+    </defs>
+  </g>
+  
+  <!-- 图标 -->
+  <g>
+    <!-- 数据图标 -->
+    <g transform="translate(150, 100)">
+      <circle cx="0" cy="0" r="25" fill="#F39C12" opacity="0.8"/>
+      <text x="0" y="5" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">数据</text>
+    </g>
+    
+    <!-- 管理图标 -->
+    <g transform="translate(450, 100)">
+      <circle cx="0" cy="0" r="25" fill="#3498DB" opacity="0.8"/>
+      <text x="0" y="5" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">管理</text>
+    </g>
+  </g>
+  
+  <!-- 底部说明 -->
+  <g transform="translate(300, 320)">
+    <rect x="-200" y="-25" width="400" height="50" fill="#008679" opacity="0.1" rx="5" ry="5"/>
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#008679">全流程数字化管理</text>
+    <text x="0" y="20" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#4A5568">提高效率 · 确保公平 · 增强透明度</text>
+  </g>
+</svg>

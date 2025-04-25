@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#F5F7F7" opacity="0.1"/>
+  
+  <!-- 几何形状组合 -->
+  <!-- 主要形状 - 波浪 -->
+  <path d="M-100,300 C50,200 150,450 300,350 C450,250 550,450 700,350 C850,250 950,400 1100,300 L1100,700 L-100,700 Z" fill="#008679" opacity="0.3">
+    <animate attributeName="d" values="M-100,300 C50,200 150,450 300,350 C450,250 550,450 700,350 C850,250 950,400 1100,300 L1100,700 L-100,700 Z;M-100,320 C50,220 150,470 300,370 C450,270 550,470 700,370 C850,270 950,420 1100,320 L1100,700 L-100,700 Z;M-100,300 C50,200 150,450 300,350 C450,250 550,450 700,350 C850,250 950,400 1100,300 L1100,700 L-100,700 Z" dur="15s" repeatCount="indefinite" />
+  </path>
+  
+  <!-- 辅助形状 - 圆形 -->
+  <circle cx="200" cy="150" r="120" fill="#00A896" opacity="0.2">
+    <animate attributeName="r" values="120;130;120" dur="10s" repeatCount="indefinite" />
+  </circle>
+  
+  <circle cx="600" cy="100" r="80" fill="#005F56" opacity="0.15">
+    <animate attributeName="r" values="80;90;80" dur="12s" repeatCount="indefinite" />
+  </circle>
+  
+  <!-- 装饰线条 -->
+  <path d="M0,100 L800,100" stroke="#008679" stroke-width="2" opacity="0.1" />
+  <path d="M0,200 L800,200" stroke="#00A896" stroke-width="2" opacity="0.1" />
+  <path d="M0,300 L800,300" stroke="#005F56" stroke-width="2" opacity="0.1" />
+  
+  <!-- 几何装饰 -->
+  <rect x="50" y="350" width="100" height="100" rx="10" fill="#008679" opacity="0.1" />
+  <rect x="650" y="250" width="80" height="80" rx="10" fill="#00A896" opacity="0.1" />
+  
+  <!-- 动态三角形 -->
+  <polygon points="400,50 450,150 350,150" fill="#005F56" opacity="0.15">
+    <animate attributeName="points" values="400,50 450,150 350,150;400,60 460,160 340,160;400,50 450,150 350,150" dur="20s" repeatCount="indefinite" />
+  </polygon>
+</svg>

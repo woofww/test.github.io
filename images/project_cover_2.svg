@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200">
+  <!-- 背景 -->
+  <rect width="600" height="200" fill="#F5F7F7"/>
+  
+  <!-- 天空 -->
+  <rect width="600" height="80" fill="#3498DB" opacity="0.3"/>
+  
+  <!-- 太阳 -->
+  <circle cx="500" cy="40" r="20" fill="#F39C12"/>
+  
+  <!-- 云朵 -->
+  <circle cx="400" cy="30" r="10" fill="#FFFFFF"/>
+  <circle cx="410" cy="25" r="12" fill="#FFFFFF"/>
+  <circle cx="420" cy="30" r="10" fill="#FFFFFF"/>
+  
+  <!-- 建筑工地 -->
+  <rect x="50" y="80" width="500" height="120" fill="#E0E5E4"/>
+  
+  <!-- 施工围栏 -->
+  <rect x="50" y="80" width="500" height="10" fill="#F39C12"/>
+  <rect x="50" y="90" width="10" height="110" fill="#F39C12"/>
+  <rect x="540" y="90" width="10" height="110" fill="#F39C12"/>
+  
+  <!-- 施工标志 -->
+  <rect x="70" y="100" width="40" height="30" fill="#F39C12"/>
+  <text x="90" y="120" font-family="Arial" font-size="12" fill="#FFFFFF" text-anchor="middle">施工</text>
+  
+  <!-- 挖掘机 -->
+  <g transform="translate(150, 150)">
+    <!-- 挖掘机底座 -->
+    <rect x="0" y="0" width="60" height="20" fill="#F39C12"/>
+    <!-- 挖掘机履带 -->
+    <rect x="5" y="20" width="50" height="10" fill="#4A5568"/>
+    <rect x="10" y="20" width="5" height="10" fill="#E0E5E4"/>
+    <rect x="20" y="20" width="5" height="10" fill="#E0E5E4"/>
+    <rect x="30" y="20" width="5" height="10" fill="#E0E5E4"/>
+    <rect x="40" y="20" width="5" height="10" fill="#E0E5E4"/>
+    <!-- 挖掘机驾驶舱 -->
+    <rect x="10" y="-20" width="20" height="20" fill="#4A5568"/>
+    <!-- 挖掘机臂 -->
+    <rect x="30" y="-15" width="40" height="8" fill="#F39C12" transform="rotate(30 30 -15)"/>
+    <rect x="65" y="0" width="30" height="6" fill="#F39C12" transform="rotate(-30 65 0)"/>
+    <!-- 挖掘机铲斗 -->
+    <rect x="90" y="-15" width="15" height="10" fill="#4A5568" transform="rotate(-30 90 -15)"/>
+  </g>
+  
+  <!-- 建筑框架 -->
+  <g fill="#008679">
+    <!-- 框架1 -->
+    <rect x="250" y="100" width="10" height="100" fill="#005F56"/>
+    <rect x="300" y="100" width="10" height="100" fill="#005F56"/>
+    <rect x="350" y="100" width="10" height="100" fill="#005F56"/>
+    <rect x="250" y="120" width="110" height="10" fill="#005F56"/>
+    <rect x="250" y="150" width="110" height="10" fill="#005F56"/>
+    <rect x="250" y="180" width="110" height="10" fill="#005F56"/>
+  </g>
+  
+  <!-- 建筑材料堆 -->
+  <rect x="400" y="160" width="60" height="20" fill="#4A5568"/>
+  <rect x="410" y="140" width="60" height="20" fill="#4A5568"/>
+  <rect x="420" y="120" width="60" height="20" fill="#4A5568"/>
+  
+  <!-- 工人 -->
+  <g transform="translate(480, 150)">
+    <!-- 身体 -->
+    <rect x="0" y="0" width="10" height="20" fill="#3498DB"/>
+    <!-- 头部 -->
+    <circle cx="5" cy="-5" r="5" fill="#E0E5E4"/>
+    <!-- 安全帽 -->
+    <path d="M0,-8 A5,3 0 0,1 10,-8 L10,-10 A5,3 0 0,1 0,-10 Z" fill="#F39C12"/>
+    <!-- 手臂 -->
+    <rect x="-5" y="5" width="10" height="3" fill="#E0E5E4" transform="rotate(30 -5 5)"/>
+    <rect x="10" y="5" width="10" height="3" fill="#E0E5E4" transform="rotate(-30 10 5)"/>
+    <!-- 腿 -->
+    <rect x="0" y="20" width="3" height="10" fill="#4A5568"/>
+    <rect x="7" y="20" width="3" height="10" fill="#4A5568"/>
+  </g>
+  
+  <!-- 起重机 -->
+  <g transform="translate(100, 180)">
+    <!-- 底座 -->
+    <rect x="0" y="0" width="30" height="10" fill="#4A5568"/>
+    <!-- 塔身 -->
+    <rect x="10" y="-100" width="10" height="100" fill="#4A5568"/>
+    <!-- 臂 -->
+    <rect x="20" y="-100" width="80" height="5" fill="#4A5568"/>
+    <!-- 吊钩 -->
+    <rect x="80" y="-100" width="2" height="20" fill="#4A5568"/>
+    <rect x="75" y="-80" width="12" height="3" fill="#4A5568"/>
+  </g>
+</svg>

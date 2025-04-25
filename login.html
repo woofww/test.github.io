@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <title>智慧征迁系统 - 登录</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="min-h-screen flex items-center justify-center relative">
+    <!-- 背景图 -->
+    <div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat" style="background: linear-gradient(135deg, #003B34, #008679, #00D6BE); filter: blur(8px); transform: scale(1.1);"></div>
+    <div class="container mx-auto px-4 py-8 relative z-10">
+        <div class="max-w-md mx-auto bg-white bg-opacity-85 backdrop-filter backdrop-blur-md rounded-lg shadow-lg overflow-hidden">
+            <!-- 登录页头部 -->
+            <div class="bg-primary-dark text-white p-6 text-center">
+                <div class="flex items-center justify-center mb-2">
+                    <i class="fas fa-city text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold">智慧征迁系统</h1>
+                </div>
+                <p class="text-sm">欢迎登录系统管理平台</p>
+            </div>
+
+            <!-- 登录表单 -->
+            <div class="p-6">
+                <!-- 登录方式切换标签 -->
+                <div class="flex border-b border-neutral mb-6">
+                    <button id="tab-username" class="flex-1 py-2 px-4 text-center font-medium text-primary border-b-2 border-primary">
+                        <i class="fas fa-user mr-2"></i>用户名登录
+                    </button>
+                    <button id="tab-phone" class="flex-1 py-2 px-4 text-center font-medium text-neutral-dark">
+                        <i class="fas fa-mobile-alt mr-2"></i>手机验证码登录
+                    </button>
+                </div>
+
+                <!-- 用户名登录表单 -->
+                <form id="form-username" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-neutral-dark mb-1">用户名</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-user text-neutral"></i>
+                            </div>
+                            <input type="text" id="username" name="username" class="block w-full pl-10 pr-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" placeholder="请输入用户名" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-neutral-dark mb-1">密码</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-neutral"></i>
+                            </div>
+                            <input type="password" id="password" name="password" class="block w-full pl-10 pr-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" placeholder="请输入密码" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="captcha" class="block text-sm font-medium text-neutral-dark mb-1">验证码</label>
+                        <div class="flex space-x-2">
+                            <div class="relative flex-1">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-shield-alt text-neutral"></i>
+                                </div>
+                                <input type="text" id="captcha" name="captcha" class="block w-full pl-10 pr-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" placeholder="请输入验证码" required>
+                            </div>
+                            <div id="captcha-image" class="h-10 w-24 flex items-center justify-center bg-neutral-light border border-neutral rounded-md cursor-pointer overflow-hidden">
+                                <!-- 验证码将在这里显示 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                            <label for="remember-me" class="ml-2 block text-sm text-neutral-dark">记住我</label>
+                        </div>
+                        <a href="#" class="text-sm text-primary hover:text-primary-light">忘记密码?</a>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i class="fas fa-sign-in-alt mr-2"></i>登录
+                        </button>
+                    </div>
+                </form>
+
+                <!-- 手机验证码登录表单 -->
+                <form id="form-phone" class="space-y-4 hidden">
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-neutral-dark mb-1">手机号码</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-mobile-alt text-neutral"></i>
+                            </div>
+                            <input type="tel" id="phone" name="phone" class="block w-full pl-10 pr-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" placeholder="请输入手机号码" required pattern="[0-9]{11}">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="verification-code" class="block text-sm font-medium text-neutral-dark mb-1">验证码</label>
+                        <div class="flex space-x-2">
+                            <div class="relative flex-1">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-key text-neutral"></i>
+                                </div>
+                                <input type="text" id="verification-code" name="verification-code" class="block w-full pl-10 pr-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" placeholder="请输入验证码" required>
+                            </div>
+                            <button type="button" id="send-code" class="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-300">
+                                获取验证码
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="remember-phone" name="remember-phone" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-neutral rounded">
+                        <label for="remember-phone" class="ml-2 block text-sm text-neutral-dark">记住手机号</label>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i class="fas fa-sign-in-alt mr-2"></i>登录
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 页脚 -->
+            <div class="px-6 py-4 bg-neutral-light border-t border-neutral text-center">
+                <p class="text-sm text-neutral-dark">还没有账号? <a href="#" class="text-primary hover:text-primary-light">联系管理员</a></p>
+                <p class="text-xs text-neutral-dark mt-2">© 2023 智慧征迁系统 版权所有</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取元素
+            const tabUsername = document.getElementById('tab-username');
+            const tabPhone = document.getElementById('tab-phone');
+            const formUsername = document.getElementById('form-username');
+            const formPhone = document.getElementById('form-phone');
+            const sendCodeBtn = document.getElementById('send-code');
+            const captchaImage = document.getElementById('captcha-image');
+            const captchaInput = document.getElementById('captcha');
+            
+            // 存储当前验证码
+            let currentCaptcha = '';
+
+            // 切换到用户名登录
+            tabUsername.addEventListener('click', function() {
+                tabUsername.classList.add('text-primary', 'border-b-2', 'border-primary');
+                tabUsername.classList.remove('text-neutral-dark');
+                tabPhone.classList.remove('text-primary', 'border-b-2', 'border-primary');
+                tabPhone.classList.add('text-neutral-dark');
+                formUsername.classList.remove('hidden');
+                formPhone.classList.add('hidden');
+            });
+
+            // 切换到手机验证码登录
+            tabPhone.addEventListener('click', function() {
+                tabPhone.classList.add('text-primary', 'border-b-2', 'border-primary');
+                tabPhone.classList.remove('text-neutral-dark');
+                tabUsername.classList.remove('text-primary', 'border-b-2', 'border-primary');
+                tabUsername.classList.add('text-neutral-dark');
+                formPhone.classList.remove('hidden');
+                formUsername.classList.add('hidden');
+            });
+
+            // 发送验证码倒计时
+            sendCodeBtn.addEventListener('click', function() {
+                const phone = document.getElementById('phone').value;
+                if (!phone || phone.length !== 11) {
+                    alert('请输入正确的手机号码');
+                    return;
+                }
+
+                // 模拟发送验证码
+                let countdown = 60;
+                sendCodeBtn.disabled = true;
+                sendCodeBtn.innerText = `${countdown}秒后重新获取`;
+                
+                const timer = setInterval(() => {
+                    countdown--;
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        sendCodeBtn.disabled = false;
+                        sendCodeBtn.innerText = '获取验证码';
+                    } else {
+                        sendCodeBtn.innerText = `${countdown}秒后重新获取`;
+                    }
+                }, 1000);
+            });
+
+            // 生成随机验证码
+            function generateCaptcha() {
+                const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+                let captcha = '';
+                for (let i = 0; i < 4; i++) {
+                    const randomIndex = Math.floor(Math.random() * chars.length);
+                    captcha += chars[randomIndex];
+                }
+                return captcha;
+            }
+
+            // 显示验证码
+            function displayCaptcha() {
+                currentCaptcha = generateCaptcha();
+                
+                // 创建canvas元素
+                const canvas = document.createElement('canvas');
+                canvas.width = 96;
+                canvas.height = 40;
+                const ctx = canvas.getContext('2d');
+                
+                // 绘制背景
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 绘制干扰线
+                for (let i = 0; i < 3; i++) {
+                    ctx.strokeStyle = getRandomColor(150, 200);
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                    ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                    ctx.stroke();
+                }
+                
+                // 绘制干扰点
+                for (let i = 0; i < 30; i++) {
+                    ctx.fillStyle = getRandomColor(150, 200);
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+                
+                // 绘制验证码文字
+                ctx.fillStyle = '#008679';
+                ctx.font = 'bold 24px Arial';
+                ctx.textBaseline = 'middle';
+                
+                // 随机旋转每个字符
+                for (let i = 0; i < currentCaptcha.length; i++) {
+                    const char = currentCaptcha.charAt(i);
+                    const x = 10 + i * 20;
+                    const y = 20;
+                    
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate((Math.random() - 0.5) * 0.3);
+                    ctx.fillText(char, 0, 0);
+                    ctx.restore();
+                }
+                
+                // 清除之前的内容并添加新的canvas
+                captchaImage.innerHTML = '';
+                captchaImage.appendChild(canvas);
+            }
+            
+            // 生成随机颜色
+            function getRandomColor(min, max) {
+                const r = Math.floor(Math.random() * (max - min + 1)) + min;
+                const g = Math.floor(Math.random() * (max - min + 1)) + min;
+                const b = Math.floor(Math.random() * (max - min + 1)) + min;
+                return `rgb(${r},${g},${b})`;
+            }
+            
+            // 初始化验证码
+            displayCaptcha();
+            
+            // 点击验证码图片刷新
+            captchaImage.addEventListener('click', function() {
+                displayCaptcha();
+            });
+            
+            // 表单提交处理
+            formUsername.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // 验证码验证
+                const captchaValue = captchaInput.value.trim();
+                if (captchaValue.toLowerCase() !== currentCaptcha.toLowerCase()) {
+                    alert('验证码错误，请重新输入');
+                    displayCaptcha();
+                    captchaInput.value = '';
+                    captchaInput.focus();
+                    return;
+                }
+                
+                // 这里可以添加用户名密码验证逻辑
+                // 验证成功后跳转到控制台页面
+                window.location.href = 'dashboard.html';
+            });
+
+            formPhone.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // 这里可以添加手机验证码验证逻辑
+                // 验证成功后跳转到控制台页面
+                window.location.href = 'dashboard.html';
+            });
+        });
+    </script>
+</body>
+</html>

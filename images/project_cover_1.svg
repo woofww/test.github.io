@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200">
+  <!-- 背景 -->
+  <rect width="600" height="200" fill="#E8F4F2"/>
+  
+  <!-- 城市轮廓 -->
+  <g fill="#008679">
+    <!-- 建筑1 -->
+    <rect x="50" y="80" width="40" height="120" fill="#005F56"/>
+    <rect x="55" y="90" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="75" y="90" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="55" y="115" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="75" y="115" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="55" y="140" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="75" y="140" width="10" height="15" fill="#E8F4F2"/>
+    
+    <!-- 建筑2 -->
+    <rect x="100" y="100" width="60" height="100" fill="#008679"/>
+    <rect x="110" y="110" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="130" y="110" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="110" y="135" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="130" y="135" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="110" y="160" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="130" y="160" width="10" height="15" fill="#E8F4F2"/>
+    
+    <!-- 建筑3 -->
+    <rect x="170" y="60" width="50" height="140" fill="#00A896"/>
+    <rect x="180" y="70" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="200" y="70" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="180" y="95" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="200" y="95" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="180" y="120" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="200" y="120" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="180" y="145" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="200" y="145" width="10" height="15" fill="#E8F4F2"/>
+    
+    <!-- 建筑4 -->
+    <rect x="230" y="90" width="45" height="110" fill="#005F56"/>
+    <rect x="240" y="100" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="257" y="100" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="240" y="122" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="257" y="122" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="240" y="144" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="257" y="144" width="8" height="12" fill="#E8F4F2"/>
+    
+    <!-- 建筑5 -->
+    <rect x="285" y="70" width="55" height="130" fill="#008679"/>
+    <rect x="295" y="80" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="315" y="80" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="295" y="105" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="315" y="105" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="295" y="130" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="315" y="130" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="295" y="155" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="315" y="155" width="10" height="15" fill="#E8F4F2"/>
+    
+    <!-- 建筑6 -->
+    <rect x="350" y="110" width="40" height="90" fill="#00A896"/>
+    <rect x="360" y="120" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="375" y="120" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="360" y="142" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="375" y="142" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="360" y="164" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="375" y="164" width="8" height="12" fill="#E8F4F2"/>
+    
+    <!-- 建筑7 -->
+    <rect x="400" y="80" width="50" height="120" fill="#005F56"/>
+    <rect x="410" y="90" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="430" y="90" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="410" y="115" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="430" y="115" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="410" y="140" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="430" y="140" width="10" height="15" fill="#E8F4F2"/>
+    
+    <!-- 建筑8 -->
+    <rect x="460" y="100" width="60" height="100" fill="#008679"/>
+    <rect x="470" y="110" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="490" y="110" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="470" y="135" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="490" y="135" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="470" y="160" width="10" height="15" fill="#E8F4F2"/>
+    <rect x="490" y="160" width="10" height="15" fill="#E8F4F2"/>
+    
+    <!-- 建筑9 -->
+    <rect x="530" y="70" width="40" height="130" fill="#00A896"/>
+    <rect x="540" y="80" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="555" y="80" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="540" y="102" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="555" y="102" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="540" y="124" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="555" y="124" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="540" y="146" width="8" height="12" fill="#E8F4F2"/>
+    <rect x="555" y="146" width="8" height="12" fill="#E8F4F2"/>
+  </g>
+  
+  <!-- 道路 -->
+  <rect x="0" y="180" width="600" height="20" fill="#4A5568"/>
+  <rect x="20" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="70" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="120" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="170" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="220" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="270" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="320" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="370" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="420" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="470" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="520" y="185" width="30" height="3" fill="#FFFFFF"/>
+  <rect x="570" y="185" width="30" height="3" fill="#FFFFFF"/>
+  
+  <!-- 太阳 -->
+  <circle cx="50" cy="50" r="20" fill="#F39C12"/>
+  
+  <!-- 云朵 -->
+  <circle cx="100" cy="40" r="10" fill="#FFFFFF"/>
+  <circle cx="110" cy="35" r="12" fill="#FFFFFF"/>
+  <circle cx="120" cy="40" r="10" fill="#FFFFFF"/>
+  
+  <circle cx="400" cy="30" r="8" fill="#FFFFFF"/>
+  <circle cx="410" cy="25" r="10" fill="#FFFFFF"/>
+  <circle cx="420" cy="30" r="8" fill="#FFFFFF"/>
+  
+  <circle cx="500" cy="50" r="12" fill="#FFFFFF"/>
+  <circle cx="515" cy="45" r="15" fill="#FFFFFF"/>
+  <circle cx="530" cy="50" r="12" fill="#FFFFFF"/>
+</svg>

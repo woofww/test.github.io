@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>征迁补偿系统 - 系统日志</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* 侧边栏收缩样式 */
+    .sidebar.collapsed {
+        width: 5rem;
+    }
+    .sidebar.collapsed .sidebar-toggle i {
+        transform: rotate(180deg);
+    }
+    .main-content.expanded {
+        margin-left: 0;
+    }
+    .sidebar-toggle {
+        transition: transform 0.3s;
+    }
+    .sidebar nav a {
+        white-space: nowrap;
+    }
+</style>
+<body class="bg-neutral-light min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <div class="bg-primary-dark text-white w-64 flex-shrink-0 hidden md:block transition-all duration-300 sidebar" id="sidebar">
+            <div class="p-4 border-b border-primary flex justify-between items-center">
+                <h1 class="text-xl font-bold">征迁补偿系统</h1>
+                <button class="sidebar-toggle text-white focus:outline-none">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <a href="dashboard.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>控制台</span>
+                </a>
+                <a href="projects.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    <span>项目管理</span>
+                </a>
+                <a href="compensation.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span>补偿标准</span>
+                </a>
+                <a href="applications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>申请处理</span>
+                </a>
+                <a href="reports.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>统计报表</span>
+                </a>
+                <a href="alerts.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <span>预警管理</span>
+                </a>
+                <a href="notifications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-bell mr-3"></i>
+                    <span>通知中心</span>
+                </a>
+                <a href="settings.html" class="flex items-center py-3 px-4 bg-primary">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-neutral-dark mr-4 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">系统日志</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative mr-4">
+                            <button class="text-neutral-dark hover:text-primary focus:outline-none">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                            </button>
+                        </div>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-neutral-dark hover:text-primary focus:outline-none">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+                                <span class="ml-2 hidden md:block">管理员</span>
+                                <i class="fas fa-chevron-down ml-1 hidden md:block"></i>
+                            </button>
+                            <!-- 用户下拉菜单 -->
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-100" style="display: none;">
+                                <!-- 用户状态信息 -->
+                                <div class="px-4 py-2 border-b border-neutral">
+                                    <p class="text-sm font-medium text-neutral-dark">管理员</p>
+                                    <p class="text-xs text-neutral">admin@example.com</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span>
+                                        <span class="text-xs text-green-500">在线</span>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-user mr-2"></i> 个人资料
+                                </a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-cog mr-2"></i> 系统设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-bell mr-2"></i> 通知设置
+                                </a>
+                                <div class="border-t border-neutral mt-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-500 hover:bg-neutral-light transition-colors duration-150">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- 设置导航 -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="settings_basic.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>基本设置</span>
+                        </a>
+                        <a href="settings_users.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>用户管理</span>
+                        </a>
+                        <a href="settings_permissions.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>权限设置</span>
+                        </a>
+                        <a href="settings_notifications.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>通知设置</span>
+                        </a>
+                        <a href="settings_alerts.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>预警通知管理</span>
+                        </a>
+                        <a href="settings_logs.html" class="px-4 py-2 rounded-md bg-primary text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>系统日志</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 日志筛选 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">日志筛选</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <!-- 日志类型 -->
+                            <div>
+                                <label for="log-type" class="block text-sm font-medium text-neutral-dark mb-1">日志类型</label>
+                                <select id="log-type" name="log-type" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <option value="all" selected>全部类型</option>
+                                    <option value="login">登录日志</option>
+                                    <option value="operation">操作日志</option>
+                                    <option value="system">系统日志</option>
+                                    <option value="error">错误日志</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 操作人员 -->
+                            <div>
+                                <label for="operator" class="block text-sm font-medium text-neutral-dark mb-1">操作人员</label>
+                                <select id="operator" name="operator" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <option value="all" selected>全部人员</option>
+                                    <option value="admin">系统管理员</option>
+                                    <option value="manager">项目经理</option>
+                                    <option value="finance">财务主管</option>
+                                    <option value="user">普通用户</option>
+                                </select>
+                            </div>
+                            
+                            <!-- 开始日期 -->
+                            <div>
+                                <label for="start-date" class="block text-sm font-medium text-neutral-dark mb-1">开始日期</label>
+                                <input type="date" id="start-date" name="start-date" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                            </div>
+                            
+                            <!-- 结束日期 -->
+                            <div>
+                                <label for="end-date" class="block text-sm font-medium text-neutral-dark mb-1">结束日期</label>
+                                <input type="date" id="end-date" name="end-date" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <input id="only-errors" type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-neutral rounded">
+                                <label for="only-errors" class="ml-2 text-sm text-neutral-dark">只显示错误日志</label>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1.5 bg-white border border-neutral text-neutral-dark rounded-md hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                    <i class="fas fa-redo-alt mr-1"></i> 重置
+                                </button>
+                                <button class="px-3 py-1.5 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                    <i class="fas fa-search mr-1"></i> 查询
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 日志列表 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <div class="p-4 border-b border-neutral flex justify-between items-center">
+                        <h3 class="text-lg font-medium text-neutral-dark">系统日志</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1.5 bg-accent-secondary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-accent-secondary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-download mr-1"></i> 导出日志
+                            </button>
+                            <button class="px-3 py-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-trash-alt mr-1"></i> 清空日志
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-neutral">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        日志ID
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        日志类型
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        操作内容
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        操作人员
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        IP地址
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        操作时间
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        操作
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-neutral">
+                                <!-- 日志1 -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                        LOG20230615001
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                            登录日志
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-neutral-dark">用户登录系统</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">管理员</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">192.168.1.100</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">2023-06-15 08:30:15</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 日志2 -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                        LOG20230615002
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            操作日志
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-neutral-dark">新增项目"东湖新区拆迁项目"</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">项目经理</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">192.168.1.105</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">2023-06-15 09:15:42</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 日志3 -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                        LOG20230615003
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                            错误日志
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-neutral-dark">数据库连接失败</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">系统</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">127.0.0.1</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">2023-06-15 10:05:33</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 日志4 -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                        LOG20230615004
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                                            系统日志
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-neutral-dark">系统备份完成</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">系统</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">127.0.0.1</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">2023-06-15 12:00:00</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 日志5 -->
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
+                                        LOG20230615005
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            操作日志
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-neutral-dark">修改补偿标准"住宅房屋补偿标准"</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">财务主管</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">192.168.1.110</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-neutral-dark">2023-06-15 14:25:18</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <a href="#" class="text-accent-secondary hover:text-accent-secondary mr-3"><i class="fas fa-eye"></i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <div class="px-6 py-4 flex items-center justify-between border-t border-neutral">
+                        <div class="flex-1 flex justify-between sm:hidden">
+                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-neutral text-sm font-medium rounded-md text-neutral-dark bg-white hover:bg-neutral-light">
+                                上一页
+                            </a>
+                            <a href="#" class="ml-3 relative inline-flex items-center px-4 py-2 border border-neutral text-sm font-medium rounded-md text-neutral-dark bg-white hover:bg-neutral-light">
+                                下一页
+                            </a>
+                        </div>
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-neutral-dark">
+                                    显示第 <span class="font-medium">1</span> 至 <span class="font-medium">5</span> 条，共 <span class="font-medium">24</span> 条记录
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-neutral bg-white text-sm font-medium text-neutral-dark hover:bg-neutral-light">
+                                        <span class="sr-only">上一页</span>
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                    <a href="#" aria-current="page" class="z-10 bg-primary text-white relative inline-flex items-center px-4 py-2 border border-primary text-sm font-medium">
+                                        1
+                                    </a>
+                                    <a href="#" class="bg-white border-neutral text-neutral-dark hover:bg-neutral-light relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                        5
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral bg-white text-sm font-medium text-neutral-dark hover:bg-neutral-light">
+                                        <span class="sr-only">下一页</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 日志设置 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">日志设置</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 日志保留时间 -->
+                            <div>
+                                <label for="log-retention" class="block text-sm font-medium text-neutral-dark mb-1">日志保留时间</label>
+                                <div class="flex items-center">
+                                    <select id="log-retention" name="log-retention" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                        <option value="30">30天</option>
+                                        <option value="60">60天</option>
+                                        <option value="90" selected>90天</option>
+                                        <option value="180">180天</option>
+                                        <option value="365">365天</option>
+                                    </select>
+                                </div>
+                                <p class="mt-1 text-xs text-neutral">超过保留时间的日志将被自动清理</p>
+                            </div>
+                            
+                            <!-- 日志备份设置 -->
+                            <div>
+                                <label for="log-backup" class="block text-sm font-medium text-neutral-dark mb-1">日志备份设置</label>
+                                <div class="flex items-center space-x-2">
+                                    <select id="log-backup" name="log-backup" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                        <option value="none">不备份</option>
+                                        <option value="daily">每日备份</option>
+                                        <option value="weekly" selected>每周备份</option>
+                                        <option value="monthly">每月备份</option>
+                                    </select>
+                                </div>
+                                <p class="mt-1 text-xs text-neutral">系统将按设定频率自动备份日志文件</p>
+                            </div>
+                            
+                            <!-- 日志记录级别 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-2">日志记录级别</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input id="log-level-info" name="log-level" type="radio" class="h-4 w-4 text-primary focus:ring-primary border-neutral" checked>
+                                        <label for="log-level-info" class="ml-2 text-sm text-neutral-dark">信息 (记录所有操作)</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="log-level-warning" name="log-level" type="radio" class="h-4 w-4 text-primary focus:ring-primary border-neutral">
+                                        <label for="log-level-warning" class="ml-2 text-sm text-neutral-dark">警告 (仅记录警告和错误)</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="log-level-error" name="log-level" type="radio" class="h-4 w-4 text-primary focus:ring-primary border-neutral">
+                                        <label for="log-level-error" class="ml-2 text-sm text-neutral-dark">错误 (仅记录错误)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 日志存储位置 -->
+                            <div>
+                                <label for="log-storage" class="block text-sm font-medium text-neutral-dark mb-1">日志存储位置</label>
+                                <select id="log-storage" name="log-storage" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <option value="database" selected>数据库</option>
+                                    <option value="file">文件系统</option>
+                                    <option value="both">数据库和文件系统</option>
+                                </select>
+                                <p class="mt-1 text-xs text-neutral">选择日志的存储方式</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end mt-6">
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-1"></i> 保存设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html> px-4 py-2 border text-sm font-medium">
+                                        2
+                                    </a>
+                                    <a href="#" class="bg-white border-neutral text-neutral-dark hover:bg-neutral-light relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                        5
+                                    </a>
+                                    <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral bg-white text-sm font-medium text-neutral-dark hover:bg-neutral-light">
+                                        <span class="sr-only">下一页</span>
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 日志设置 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">日志设置</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 日志保留时间 -->
+                            <div>
+                                <label for="log-retention" class="block text-sm font-medium text-neutral-dark mb-1">日志保留时间</label>
+                                <div class="flex items-center">
+                                    <select id="log-retention" name="log-retention" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                        <option value="30">30天</option>
+                                        <option value="60">60天</option>
+                                        <option value="90" selected>90天</option>
+                                        <option value="180">180天</option>
+                                        <option value="365">365天</option>
+                                    </select>
+                                </div>
+                                <p class="mt-1 text-xs text-neutral">超过保留时间的日志将被自动清理</p>
+                            </div>
+                            
+                            <!-- 日志备份设置 -->
+                            <div>
+                                <label for="log-backup" class="block text-sm font-medium text-neutral-dark mb-1">日志备份设置</label>
+                                <div class="flex items-center space-x-2">
+                                    <select id="log-backup" name="log-backup" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                        <option value="none">不备份</option>
+                                        <option value="daily">每日备份</option>
+                                        <option value="weekly" selected>每周备份</option>
+                                        <option value="monthly">每月备份</option>
+                                    </select>
+                                </div>
+                                <p class="mt-1 text-xs text-neutral">系统将按设定频率自动备份日志文件</p>
+                            </div>
+                            
+                            <!-- 日志记录级别 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-2">日志记录级别</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <input id="log-level-info" name="log-level" type="radio" class="h-4 w-4 text-primary focus:ring-primary border-neutral" checked>
+                                        <label for="log-level-info" class="ml-2 text-sm text-neutral-dark">信息 (记录所有操作)</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="log-level-warning" name="log-level" type="radio" class="h-4 w-4 text-primary focus:ring-primary border-neutral">
+                                        <label for="log-level-warning" class="ml-2 text-sm text-neutral-dark">警告 (仅记录警告和错误)</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input id="log-level-error" name="log-level" type="radio" class="h-4 w-4 text-primary focus:ring-primary border-neutral">
+                                        <label for="log-level-error" class="ml-2 text-sm text-neutral-dark">错误 (仅记录错误)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 日志存储位置 -->
+                            <div>
+                                <label for="log-storage" class="block text-sm font-medium text-neutral-dark mb-1">日志存储位置</label>
+                                <select id="log-storage" name="log-storage" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <option value="database" selected>数据库</option>
+                                    <option value="file">文件系统</option>
+                                    <option value="both">数据库和文件系统</option>
+                                </select>
+                                <p class="mt-1 text-xs text-neutral">选择日志的存储方式</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end mt-6">
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-1"></i> 保存设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html> px-4 py-2 border text-sm font-medium">
+                                        3
+                                    </a>
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-neutral bg-white text-sm font-medium text-neutral-dark">
+                                        ...
+                                    </span>
+                                    <a href="#" class="bg-white border-neutral text-neutral-dark hover:bg

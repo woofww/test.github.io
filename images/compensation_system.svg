@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <!-- 背景 -->
+  <rect width="600" height="400" fill="#f5f7f7" rx="10" ry="10"/>
+  
+  <!-- 标题 -->
+  <text x="300" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#008679">智慧征迁系统示意图</text>
+  
+  <!-- 中央建筑图标 -->
+  <g transform="translate(300, 200)">
+    <!-- 主楼 -->
+    <rect x="-60" y="-80" width="120" height="140" fill="#008679" rx="5" ry="5"/>
+    <!-- 窗户 -->
+    <g fill="#f5f7f7">
+      <rect x="-45" y="-65" width="20" height="20" rx="2" ry="2"/>
+      <rect x="-15" y="-65" width="20" height="20" rx="2" ry="2"/>
+      <rect x="15" y="-65" width="20" height="20" rx="2" ry="2"/>
+      
+      <rect x="-45" y="-35" width="20" height="20" rx="2" ry="2"/>
+      <rect x="-15" y="-35" width="20" height="20" rx="2" ry="2"/>
+      <rect x="15" y="-35" width="20" height="20" rx="2" ry="2"/>
+      
+      <rect x="-45" y="-5" width="20" height="20" rx="2" ry="2"/>
+      <rect x="-15" y="-5" width="20" height="20" rx="2" ry="2"/>
+      <rect x="15" y="-5" width="20" height="20" rx="2" ry="2"/>
+    </g>
+    <!-- 门 -->
+    <rect x="-15" y="25" width="30" height="35" fill="#f5f7f7" rx="2" ry="2"/>
+    
+    <!-- 屋顶 -->
+    <polygon points="-70,-80 0,-120 70,-80" fill="#00A896"/>
+  </g>
+  
+  <!-- 左侧图标：文档 -->
+  <g transform="translate(150, 200)">
+    <rect x="-30" y="-40" width="60" height="80" fill="#ffffff" stroke="#008679" stroke-width="2" rx="3" ry="3"/>
+    <line x1="-15" y1="-20" x2="15" y2="-20" stroke="#008679" stroke-width="2"/>
+    <line x1="-15" y1="0" x2="15" y2="0" stroke="#008679" stroke-width="2"/>
+    <line x1="-15" y1="20" x2="15" y2="20" stroke="#008679" stroke-width="2"/>
+  </g>
+  
+  <!-- 右侧图标：图表 -->
+  <g transform="translate(450, 200)">
+    <rect x="-35" y="-40" width="70" height="80" fill="#ffffff" stroke="#008679" stroke-width="2" rx="3" ry="3"/>
+    <rect x="-25" y="10" width="15" height="25" fill="#F39C12"/>
+    <rect x="-5" y="0" width="15" height="35" fill="#008679"/>
+    <rect x="15" y="-15" width="15" height="50" fill="#3498DB"/>
+  </g>
+  
+  <!-- 连接线 -->
+  <g stroke="#008679" stroke-width="2" fill="none">
+    <path d="M180,200 C220,180 260,180 300,200" stroke-dasharray="5,5"/>
+    <path d="M420,200 C380,180 340,180 300,200" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- 底部文字 -->
+  <text x="300" y="320" font-family="Arial, sans-serif" font-size="16" text-anchor="middle" fill="#4A5568">高效、公平、透明的征迁补偿管理平台</text>
+  <text x="300" y="350" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#4A5568">为政府部门提供全流程征迁补偿管理解决方案</text>
+</svg>

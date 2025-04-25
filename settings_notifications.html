@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧征迁系统 - 通知设置</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* 侧边栏收缩样式 */
+    .sidebar.collapsed {
+        width: 5rem;
+    }
+    .sidebar.collapsed .sidebar-toggle i {
+        transform: rotate(180deg);
+    }
+    .main-content.expanded {
+        margin-left: 0;
+    }
+    .sidebar-toggle {
+        transition: transform 0.3s;
+    }
+    .sidebar nav a {
+        white-space: nowrap;
+    }
+</style>
+<body class="bg-neutral-light min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <div class="bg-primary-dark text-white w-64 flex-shrink-0 hidden md:block transition-all duration-300 sidebar" id="sidebar">
+            <div class="p-4 border-b border-primary flex justify-between items-center">
+                <h1 class="text-xl font-bold">智慧征迁系统</h1>
+                <button class="sidebar-toggle text-white focus:outline-none">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <a href="dashboard.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>控制台</span>
+                </a>
+                <a href="projects.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    <span>项目管理</span>
+                </a>
+                <a href="compensation.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span>补偿标准</span>
+                </a>
+                <a href="applications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>申请处理</span>
+                </a>
+                <a href="reports.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>统计报表</span>
+                </a>
+                <a href="alerts.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <span>预警管理</span>
+                </a>
+                <a href="notifications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-bell mr-3"></i>
+                    <span>通知中心</span>
+                </a>
+                <a href="settings.html" class="flex items-center py-3 px-4 bg-primary">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden main-content transition-all duration-300">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-neutral-dark mr-4 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">通知设置</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative mr-4">
+                            <button class="text-neutral-dark hover:text-primary focus:outline-none">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                            </button>
+                        </div>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-neutral-dark hover:text-primary focus:outline-none">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+                                <span class="ml-2 hidden md:block">管理员</span>
+                                <i class="fas fa-chevron-down ml-1 hidden md:block"></i>
+                            </button>
+                            <!-- 用户下拉菜单 -->
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-100" style="display: none;">
+                                <!-- 用户状态信息 -->
+                                <div class="px-4 py-2 border-b border-neutral">
+                                    <p class="text-sm font-medium text-neutral-dark">管理员</p>
+                                    <p class="text-xs text-neutral">admin@example.com</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span>
+                                        <span class="text-xs text-green-500">在线</span>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-user mr-2"></i> 个人资料
+                                </a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-cog mr-2"></i> 系统设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-bell mr-2"></i> 通知设置
+                                </a>
+                                <div class="border-t border-neutral mt-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-500 hover:bg-neutral-light transition-colors duration-150">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- 设置导航 -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="settings_basic.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>基本设置</span>
+                        </a>
+                        <a href="settings_users.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>用户管理</span>
+                        </a>
+                        <a href="settings_permissions.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>权限设置</span>
+                        </a>
+                        <a href="settings_notifications.html" class="px-4 py-2 rounded-md bg-primary text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>通知设置</span>
+                        </a>
+                        <a href="settings_alerts.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>预警通知管理</span>
+                        </a>
+                        <a href="settings_logs.html" class="px-4 py-2 rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <span>系统日志</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 通知设置内容 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">通知渠道设置</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="mb-6">
+                            <p class="text-sm text-neutral-dark mb-4">配置系统通知的发送渠道和方式，确保重要信息能够及时送达</p>
+                            
+                            <!-- 邮件通知设置 -->
+                            <div class="border border-neutral rounded-lg p-4 mb-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-envelope text-xl text-primary mr-3"></i>
+                                        <h4 class="font-medium text-neutral-dark">邮件通知</h4>
+                                    </div>
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" value="" class="sr-only peer" checked>
+                                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label for="smtp-server" class="block text-sm font-medium text-neutral-dark mb-1">SMTP服务器</label>
+                                        <input type="text" id="smtp-server" name="smtp-server" value="smtp.example.com" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                    <div>
+                                        <label for="smtp-port" class="block text-sm font-medium text-neutral-dark mb-1">SMTP端口</label>
+                                        <input type="number" id="smtp-port" name="smtp-port" value="587" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                    <div>
+                                        <label for="smtp-username" class="block text-sm font-medium text-neutral-dark mb-1">SMTP用户名</label>
+                                        <input type="text" id="smtp-username" name="smtp-username" value="notification@example.com" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                    <div>
+                                        <label for="smtp-password" class="block text-sm font-medium text-neutral-dark mb-1">SMTP密码</label>
+                                        <input type="password" id="smtp-password" name="smtp-password" value="********" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button class="px-3 py-1.5 bg-accent-secondary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-accent-secondary focus:ring-offset-2 transition-colors duration-200 mr-2">
+                                        <i class="fas fa-paper-plane mr-1"></i> 发送测试邮件
+                                    </button>
+                                    <button class="px-3 py-1.5 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                        <i class="fas fa-save mr-1"></i> 保存设置
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 短信通知设置 -->
+                            <div class="border border-neutral rounded-lg p-4 mb-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-sms text-xl text-primary mr-3"></i>
+                                        <h4 class="font-medium text-neutral-dark">短信通知</h4>
+                                    </div>
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" value="" class="sr-only peer" checked>
+                                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label for="sms-provider" class="block text-sm font-medium text-neutral-dark mb-1">短信服务提供商</label>
+                                        <select id="sms-provider" name="sms-provider" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                            <option value="aliyun" selected>阿里云短信服务</option>
+                                            <option value="tencent">腾讯云短信服务</option>
+                                            <option value="other">其他服务商</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="sms-sign" class="block text-sm font-medium text-neutral-dark mb-1">短信签名</label>
+                                        <input type="text" id="sms-sign" name="sms-sign" value="智慧征迁系统" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                    <div>
+                                        <label for="sms-access-key" class="block text-sm font-medium text-neutral-dark mb-1">AccessKey ID</label>
+                                        <input type="text" id="sms-access-key" name="sms-access-key" value="LTAI4G*********" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                    <div>
+                                        <label for="sms-access-secret" class="block text-sm font-medium text-neutral-dark mb-1">AccessKey Secret</label>
+                                        <input type="password" id="sms-access-secret" name="sms-access-secret" value="********" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button class="px-3 py-1.5 bg-accent-secondary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-accent-secondary focus:ring-offset-2 transition-colors duration-200 mr-2">
+                                        <i class="fas fa-paper-plane mr-1"></i> 发送测试短信
+                                    </button>
+                                    <button class="px-3 py-1.5 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                        <i class="fas fa-save mr-1"></i> 保存设置
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 微信通知设置 -->
+                            <div class="border border-neutral rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-weixin text-xl text-primary mr-3"></i>
+                                        <h4 class="font-medium text-neutral-dark">微信通知</h4>
+                                    </div>
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" value="" class="sr-only peer">
+                                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label for="wechat-appid" class="block text-sm font-medium text-neutral-dark mb-1">AppID</label>
+                                        <input type="text" id="wechat-appid" name="wechat-appid" placeholder="请输入微信公众号AppID" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                    <div>
+                                        <label for="wechat-secret" class="block text-sm font-medium text-neutral-dark mb-1">AppSecret</label>
+                                        <input type="password" id="wechat-secret" name="wechat-secret" placeholder="请输入微信公众号AppSecret" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                    <div>
+                                        <label for="wechat-template-id" class="block text-sm font-medium text-neutral-dark mb-1">消息模板ID</label>
+                                        <input type="text" id="wechat-template-id" name="wechat-template-id" placeholder="请输入消息模板ID" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button class="px-3 py-1.5 bg-accent-secondary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-accent-secondary focus:ring-offset-2 transition-colors duration-200 mr-2" disabled>
+                                        <i class="fas fa-paper-plane mr-1"></i> 发送测试消息
+                                    </button>
+                                    <button class="px-3 py-1.5 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                        <i class="fas fa-save mr-1"></i> 保存设置
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 通知类型设置 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">通知类型设置</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-neutral-dark mb-4">配置不同类型通知的接收方式和频率</p>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-neutral">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            通知类型
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            系统内通知
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            邮件通知
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            短信通知
+                                        </th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                            微信通知
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-neutral">
+                                    <!-- 项目更新通知 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">项目更新通知</div>
+                                            <div class="text-xs text-neutral">项目信息变更、状态更新等</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer">
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- 申请处理通知 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">申请处理通知</div>
+                                            <div class="text-xs text-neutral">申请状态变更、审批结果等</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer">
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- 系统预警通知 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">系统预警通知</div>
+                                            <div class="text-xs text-neutral">系统异常、安全警告等</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="flex justify-end mt-4">
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-1"></i> 保存设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 通知频率设置 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">通知频率设置</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-neutral-dark mb-4">配置系统通知的发送频率和时间</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 通知汇总频率 -->
+                            <div>
+                                <label for="notification-frequency" class="block text-sm font-medium text-neutral-dark mb-1">通知汇总频率</label>
+                                <select id="notification-frequency" name="notification-frequency" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <option value="realtime">实时发送</option>
+                                    <option value="hourly">每小时汇总</option>
+                                    <option value="daily" selected>每日汇总</option>
+                                    <option value="weekly">每周汇总</option>
+                                </select>
+                                <p class="mt-1 text-xs text-neutral">选择"实时发送"将立即发送每条通知，选择其他选项将按指定频率汇总发送</p>
+                            </div>
+                            
+                            <!-- 汇总发送时间 -->
+                            <div>
+                                <label for="notification-time" class="block text-sm font-medium text-neutral-dark mb-1">汇总发送时间</label>
+                                <input type="time" id="notification-time" name="notification-time" value="09:00" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                <p class="mt-1 text-xs text-neutral">设置汇总通知的发送时间（24小时制）</p>
+                            </div>
+                            
+                            <!-- 免打扰时间 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-1">免打扰时间</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="time" id="do-not-disturb-start" name="do-not-disturb-start" value="22:00" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <span>至</span>
+                                    <input type="time" id="do-not-disturb-end" name="do-not-disturb-end" value="08:00" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                </div>
+                                <p class="mt-1 text-xs text-neutral">在免打扰时间段内，除紧急通知外，其他通知将不会发送</p>
+                            </div>
+                            
+                            <!-- 紧急通知设置 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-1">紧急通知设置</label>
+                                <div class="flex items-center mt-2">
+                                    <input id="urgent-notification" type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-neutral rounded" checked>
+                                    <label for="urgent-notification" class="ml-2 text-sm text-neutral-dark">紧急通知不受免打扰时间限制</label>
+                                </div>
+                                <div class="flex items-center mt-2">
+                                    <input id="urgent-notification-repeat" type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-neutral rounded" checked>
+                                    <label for="urgent-notification-repeat" class="ml-2 text-sm text-neutral-dark">紧急通知未读时重复发送</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end mt-6">
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-1"></i> 保存设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html> after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer">
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- 申请处理通知 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">申请处理通知</div>
+                                            <div class="text-xs text-neutral">申请状态变更、审批结果等</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer">
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- 系统预警通知 -->
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-neutral-dark">系统预警通知</div>
+                                            <div class="text-xs text-neutral">系统异常、安全警告等</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <label class="inline-flex items-center cursor-pointer">
+                                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="flex justify-end mt-4">
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-1"></i> 保存设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 通知频率设置 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-neutral">
+                        <h3 class="text-lg font-medium text-neutral-dark">通知频率设置</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-neutral-dark mb-4">配置系统通知的发送频率和时间</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 通知汇总频率 -->
+                            <div>
+                                <label for="notification-frequency" class="block text-sm font-medium text-neutral-dark mb-1">通知汇总频率</label>
+                                <select id="notification-frequency" name="notification-frequency" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <option value="realtime">实时发送</option>
+                                    <option value="hourly">每小时汇总</option>
+                                    <option value="daily" selected>每日汇总</option>
+                                    <option value="weekly">每周汇总</option>
+                                </select>
+                                <p class="mt-1 text-xs text-neutral">选择"实时发送"将立即发送每条通知，选择其他选项将按指定频率汇总发送</p>
+                            </div>
+                            
+                            <!-- 汇总发送时间 -->
+                            <div>
+                                <label for="notification-time" class="block text-sm font-medium text-neutral-dark mb-1">汇总发送时间</label>
+                                <input type="time" id="notification-time" name="notification-time" value="09:00" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                <p class="mt-1 text-xs text-neutral">设置汇总通知的发送时间（24小时制）</p>
+                            </div>
+                            
+                            <!-- 免打扰时间 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-1">免打扰时间</label>
+                                <div class="flex items-center space-x-2">
+                                    <input type="time" id="do-not-disturb-start" name="do-not-disturb-start" value="22:00" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                    <span>至</span>
+                                    <input type="time" id="do-not-disturb-end" name="do-not-disturb-end" value="08:00" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200">
+                                </div>
+                                <p class="mt-1 text-xs text-neutral">在免打扰时间段内，除紧急通知外，其他通知将不会发送</p>
+                            </div>
+                            
+                            <!-- 紧急通知设置 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-1">紧急通知设置</label>
+                                <div class="flex items-center mt-2">
+                                    <input id="urgent-notification" type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-neutral rounded" checked>
+                                    <label for="urgent-notification" class="ml-2 text-sm text-neutral-dark">紧急通知不受免打扰时间限制</label>
+                                </div>
+                                <div class="flex items-center mt-2">
+                                    <input id="urgent-notification-repeat" type="checkbox" class="w-4 h-4 text-primary focus:ring-primary border-neutral rounded" checked>
+                                    <label for="urgent-notification-repeat" class="ml-2 text-sm text-neutral-dark">紧急通知未读时重复发送</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end mt-6">
+                            <button class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                <i class="fas fa-save mr-1"></i> 保存设置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html> after:absolute after:top-[

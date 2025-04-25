@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧征迁系统 - 申请处理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* 侧边栏收缩样式 */
+    .sidebar.collapsed {
+        width: 5rem;
+    }
+    .sidebar.collapsed .sidebar-toggle i {
+        transform: rotate(180deg);
+    }
+    .main-content.expanded {
+        margin-left: 0;
+    }
+    .sidebar-toggle {
+        transition: transform 0.3s;
+    }
+    .sidebar nav a {
+        white-space: nowrap;
+    }
+</style>
+<body class="bg-neutral-light min-h-screen">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <div class="bg-primary-dark text-white w-64 flex-shrink-0 hidden md:block transition-all duration-300 sidebar" id="sidebar">
+            <div class="p-4 border-b border-primary flex justify-between items-center">
+                <h1 class="text-xl font-bold">智慧征迁系统</h1>
+                <button class="sidebar-toggle text-white focus:outline-none">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <nav class="mt-5">
+                <a href="dashboard.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>控制台</span>
+                </a>
+                <a href="projects.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    <span>项目管理</span>
+                </a>
+                <a href="compensation.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span>补偿标准</span>
+                </a>
+                <a href="applications.html" class="flex items-center py-3 px-4 bg-primary">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>申请处理</span>
+                </a>
+                <a href="reports.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>统计报表</span>
+                </a>
+                <a href="alerts.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <span>预警管理</span>
+                </a>
+                <a href="notifications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-bell mr-3"></i>
+                    <span>通知中心</span>
+                </a>
+                <a href="settings.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden main-content transition-all duration-300">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-neutral-dark mr-4 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">申请处理</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative mr-4">
+                            <button class="text-neutral-dark hover:text-primary focus:outline-none">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                            </button>
+                        </div>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-neutral-dark hover:text-primary focus:outline-none">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+                                <span class="ml-2 hidden md:block">管理员</span>
+                                <i class="fas fa-chevron-down ml-1 hidden md:block"></i>
+                            </button>
+                            <!-- 用户下拉菜单 -->
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-100" style="display: none;">
+                                <!-- 用户状态信息 -->
+                                <div class="px-4 py-2 border-b border-neutral">
+                                    <p class="text-sm font-medium text-neutral-dark">管理员</p>
+                                    <p class="text-xs text-neutral">admin@example.com</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span>
+                                        <span class="text-xs text-green-500">在线</span>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-user mr-2"></i> 个人资料
+                                </a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-cog mr-2"></i> 系统设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-bell mr-2"></i> 通知设置
+                                </a>
+                                <div class="border-t border-neutral mt-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-500 hover:bg-neutral-light transition-colors duration-150">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- 操作栏 -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <h2 class="text-xl font-semibold text-neutral-dark">补偿申请列表</h2>
+                        <span class="ml-2 px-2 py-1 text-xs rounded-full bg-primary bg-opacity-10 text-primary">28 个待处理</span>
+                    </div>
+                    <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2">
+                        <div class="relative">
+                            <input type="text" placeholder="搜索申请..." class="w-full md:w-64 pl-10 pr-4 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-neutral"></i>
+                            </div>
+                        </div>
+                        <button class="flex items-center justify-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-150">
+                            <i class="fas fa-plus mr-2"></i>
+                            <span>新建申请</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 筛选器 -->
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex items-center">
+                            <label for="status-filter" class="block text-sm font-medium text-neutral-dark mr-2">状态:</label>
+                            <select id="status-filter" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="all">全部</option>
+                                <option value="pending" selected>待处理</option>
+                                <option value="reviewing">审核中</option>
+                                <option value="approved">已批准</option>
+                                <option value="rejected">已拒绝</option>
+                                <option value="completed">已完成</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <label for="project-filter" class="block text-sm font-medium text-neutral-dark mr-2">项目:</label>
+                            <select id="project-filter" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="all">全部项目</option>
+                                <option value="east-lake">东湖新区征迁</option>
+                                <option value="west-city">西城区改造</option>
+                                <option value="south-lake">南湖公园扩建</option>
+                                <option value="north-road">北区道路拓宽</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center">
+                            <label for="date-filter" class="block text-sm font-medium text-neutral-dark mr-2">日期:</label>
+                            <select id="date-filter" class="border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="all">全部时间</option>
+                                <option value="today">今天</option>
+                                <option value="week">本周</option>
+                                <option value="month">本月</option>
+                                <option value="quarter">本季度</option>
+                            </select>
+                        </div>
+                        <button class="ml-auto text-sm text-primary hover:text-primary-light focus:outline-none">
+                            <i class="fas fa-redo-alt mr-1"></i>
+                            <span>重置筛选器</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 申请列表 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-neutral">
+                            <thead>
+                                <tr class="bg-neutral-light">
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mr-2">
+                                            申请信息
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">申请人</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">所属项目</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">补偿类型</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">申请日期</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">状态</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-neutral-dark uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-neutral" x-data="{ showDetailModal: false, currentApplication: null }">
+                                <!-- 申请详情模态框 -->
+                                <div x-show="showDetailModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+                                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                                            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                        </div>
+                                        <div @click.away="showDetailModal = false" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                <div class="sm:flex sm:items-start">
+                                                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                                        <h3 class="text-lg leading-6 font-medium text-neutral-dark flex items-center">
+                                                            <span x-text="currentApplication?.title"></span>
+                                                            <span class="ml-2 px-2 py-1 text-xs rounded-full" :class="{
+                                                                'bg-yellow-100 text-yellow-600': currentApplication?.status === '待处理',
+                                                                'bg-blue-100 text-blue-600': currentApplication?.status === '审核中',
+                                                                'bg-green-100 text-green-600': currentApplication?.status === '已批准',
+                                                                'bg-red-100 text-red-600': currentApplication?.status === '已拒绝',
+                                                                'bg-gray-100 text-gray-600': currentApplication?.status === '已完成'
+                                                            }" x-text="currentApplication?.status"></span>
+                                                        </h3>
+                                                        <div class="text-sm text-neutral mb-4">
+                                                            申请编号: <span x-text="currentApplication?.id"></span>
+                                                        </div>
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                                            <div class="border-b pb-2">
+                                                                <div class="text-sm font-medium text-neutral-dark">申请人信息</div>
+                                                                <div class="flex items-center mt-2">
+                                                                    <img class="h-10 w-10 rounded-full" :src="currentApplication?.avatar" alt="">
+                                                                    <div class="ml-3">
+                                                                        <div class="text-sm font-medium" x-text="currentApplication?.name"></div>
+                                                                        <div class="text-xs text-neutral" x-text="currentApplication?.phone"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="border-b pb-2">
+                                                                <div class="text-sm font-medium text-neutral-dark">申请详情</div>
+                                                                <div class="mt-2 space-y-1 text-sm">
+                                                                    <div>所属项目: <span x-text="currentApplication?.project"></span></div>
+                                                                    <div>补偿类型: <span x-text="currentApplication?.type"></span></div>
+                                                                    <div>申请日期: <span x-text="currentApplication?.date"></span></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="border-b pb-4 mb-4">
+                                                            <div class="text-sm font-medium text-neutral-dark mb-2">申请描述</div>
+                                                            <p class="text-sm text-neutral-dark">该申请为标准住宅房屋补偿申请，申请人提供了房产证、户口本等必要证明文件。房屋面积为89平方米，位于东湖新区某街道。根据补偿标准，初步估算补偿金额约为120万元。</p>
+                                                        </div>
+                                                        <div class="flex justify-end space-x-3">
+                                                            <button class="px-3 py-1.5 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                                                <i class="fas fa-print mr-1"></i> 打印
+                                                            </button>
+                                                            <button class="px-3 py-1.5 border border-primary rounded-md text-primary hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                                                <i class="fas fa-edit mr-1"></i> 编辑
+                                                            </button>
+                                                            <button class="px-3 py-1.5 bg-primary text-white rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200">
+                                                                <i class="fas fa-check-circle mr-1"></i> 审批
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="bg-neutral-light px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                <button @click="showDetailModal = false" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
+                                                    关闭
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 申请1 -->
+                                <tr class="hover:bg-neutral-light cursor-pointer" @dblclick="showDetailModal = true; currentApplication = {
+                                    id: 'APP-2023-001',
+                                    title: '住宅房屋补偿申请',
+                                    status: '待处理',
+                                    name: '张三',
+                                    phone: '13812345678',
+                                    avatar: 'https://randomuser.me/api/portraits/men/11.jpg',
+                                    project: '东湖新区征迁',
+                                    type: '住宅房屋',
+                                    date: '2023-06-15'
+                                }">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mr-2">
+                                            <div>
+                                                <div class="text-sm font-medium text-neutral-dark">住宅房屋补偿申请</div>
+                                                <div class="text-xs text-neutral">申请编号: APP-2023-001</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/11.jpg" alt="">
+                                            <div class="ml-2">
+                                                <div class="text-sm font-medium text-neutral-dark">张三</div>
+                                                <div class="text-xs text-neutral">13812345678</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">东湖新区征迁</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">住宅房屋</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">2023-06-15</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-600">待处理</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary-light" @click.stop="showDetailModal = true; currentApplication = {
+                                                id: 'APP-2023-001',
+                                                title: '住宅房屋补偿申请',
+                                                status: '待处理',
+                                                name: '张三',
+                                                phone: '13812345678',
+                                                avatar: 'https://randomuser.me/api/portraits/men/11.jpg',
+                                                project: '东湖新区征迁',
+                                                type: '住宅房屋',
+                                                date: '2023-06-15'
+                                            }">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent hover:text-accent-light">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 申请2 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mr-2">
+                                            <div>
+                                                <div class="text-sm font-medium text-neutral-dark">商业用房补偿申请</div>
+                                                <div class="text-xs text-neutral">申请编号: APP-2023-002</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/women/12.jpg" alt="">
+                                            <div class="ml-2">
+                                                <div class="text-sm font-medium text-neutral-dark">李四</div>
+                                                <div class="text-xs text-neutral">13987654321</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">西城区改造</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">商业用房</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">2023-06-18</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-600">待处理</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent hover:text-accent-light">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 申请3 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mr-2">
+                                            <div>
+                                                <div class="text-sm font-medium text-neutral-dark">土地补偿申请</div>
+                                                <div class="text-xs text-neutral">申请编号: APP-2023-003</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/13.jpg" alt="">
+                                            <div class="ml-2">
+                                                <div class="text-sm font-medium text-neutral-dark">王五</div>
+                                                <div class="text-xs text-neutral">13765432198</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">南湖公园扩建</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">农用地</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">2023-06-20</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-600">审核中</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent hover:text-accent-light">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 申请4 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mr-2">
+                                            <div>
+                                                <div class="text-sm font-medium text-neutral-dark">附属物补偿申请</div>
+                                                <div class="text-xs text-neutral">申请编号: APP-2023-004</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/women/14.jpg" alt="">
+                                            <div class="ml-2">
+                                                <div class="text-sm font-medium text-neutral-dark">赵六</div>
+                                                <div class="text-xs text-neutral">13698765432</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">北区道路拓宽</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">附属物</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">2023-06-22</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-600">待处理</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent hover:text-accent-light">
+                                                <i class="fas fa-check-circle"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 申请5 -->
+                                <tr class="hover:bg-neutral-light">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="h-4 w-4 text-primary border-neutral rounded focus:ring-primary mr-2">
+                                            <div>
+                                                <div class="text-sm font-medium text-neutral-dark">住宅房屋补偿申请</div>
+                                                <div class="text-xs text-neutral">申请编号: APP-2023-005</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="https://randomuser.me/api/portraits/men/15.jpg" alt="">
+                                            <div class="ml-2">
+                                                <div class="text-sm font-medium text-neutral-dark">孙七</div>
+                                                <div class="text-xs text-neutral">13587654321</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">东湖新区征迁</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">住宅房屋</td>
+                                    <td class="px-6 py-4 text-sm text-neutral-dark">2023-06-25</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-600">已批准</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary-light">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-accent-secondary hover:text-accent-secondary-light">
+                                                <i class="fas fa-file-invoice-dollar"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-4 border-t border-neutral">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-neutral-dark">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">5</span> 共 <span class="font-medium">28</span> 条记录
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50" disabled>
+                                    上一页
+                                </button>
+                                <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                    1
+                                </button>
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    2
+                                </button>
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    3
+                                </button>
+                                <button class="px-3 py-1 border border-neutral rounded-md text-neutral-dark hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                                    下一页
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 申请详情 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-neutral">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-medium text-neutral-dark">申请详情</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-print mr-1"></i>
+                                    <span>打印</span>
+                                </button>
+                                <button class="text-primary hover:text-primary-light focus:outline-none">
+                                    <i class="fas fa-download mr-1"></i>
+                                    <span>导出</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- 申请基本信息 -->
+                            <div class="md:col-span-1">
+                                <h4 class="text-base font-medium text-neutral-dark mb-4">申请信息</h4>
+                                <div class="bg-neutral-light rounded-lg p-4">
+                                    <div class="space-y-3">
+                                        <div>
+                                            <p class="text-xs text-neutral">申请编号</p>
+                                            <p class="text-sm font-medium text-neutral-dark">APP-2023-001</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-neutral">申请类型</p>
+                                            <p class="text-sm font-medium text-neutral-dark">住宅房屋补偿</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-neutral">所属项目</p>
+                                            <p class="text-sm font-medium text-neutral-dark">东湖新区征迁</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-neutral">申请日期</p>
+                                            <p class="text-sm font-medium text-neutral-dark">2023-06-15</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-neutral">当前状态</p>
+                                            <p class="text-sm font-medium">
+                                                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-600">待

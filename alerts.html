@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>征迁补偿系统 - 预警管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#008679', // 主色调-深青绿色
+                            light: '#00A896',  // 辅助色-亮青绿色
+                            dark: '#005F56',   // 辅助色-深墨绿色
+                        },
+                        neutral: {
+                            light: '#F5F7F7',    // 浅色背景
+                            DEFAULT: '#E0E5E4', // 中性色
+                            dark: '#4A5568',    // 文字颜色
+                        },
+                        accent: {
+                            DEFAULT: '#F39C12', // 强调色-橙色
+                            secondary: '#3498DB' // 次要强调色-蓝色
+                        },
+                        alert: {
+                            high: '#E53E3E',     // 高级预警-红色
+                            medium: '#DD6B20',  // 中级预警-橙色
+                            low: '#D69E2E'      // 低级预警-黄色
+                        }
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- 引入图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        /* 自定义样式 */
+    </style>
+</head>
+<body class="bg-neutral-light min-h-screen" x-data="{
+        showCreateRuleModal: false,
+        showAlertDetailModal: false,
+        currentAlert: null,
+        ruleForm: {
+            name: '',
+            condition: '',
+            level: 'medium',
+            type: 'deadline',
+            notifyMethods: ['system'],
+            responsiblePerson: '',
+            advanceDays: 7,
+            description: '',
+            autoProcess: false
+        },
+        ruleTypes: [
+            { id: 'deadline', name: '截止日期预警', icon: 'calendar-times' },
+            { id: 'budget', name: '预算超支预警', icon: 'money-bill-wave' },
+            { id: 'document', name: '文档缺失预警', icon: 'file-alt' },
+            { id: 'approval', name: '审批延迟预警', icon: 'stamp' },
+            { id: 'custom', name: '自定义预警', icon: 'cog' }
+        ],
+        // 预警数据示例
+        alertData: [
+            {
+                id: 'AL-2023-0025',
+                type: '项目延期',
+                level: 'high',
+                levelText: '高级',
+                triggerTime: '2023-06-15 09:23',
+                status: 'pending',
+                statusText: '待处理',
+                responsiblePerson: '王经理',
+                description: '项目已超过计划完成时间15天，仍未完成主体工程验收。',
+                suggestion: '建议立即组织相关部门召开协调会议，明确责任分工和时间节点，加快推进项目进度。',
+                relatedProject: 'PRJ-2023-0012',
+                projectName: '东城区某旧城改造项目',
+                createdBy: '系统自动',
+                createdTime: '2023-06-15 09:23:45'
+            },
+            {
+                id: 'AL-2023-0024',
+                type: '预算超支',
+                level: 'medium',
+                levelText: '中级',
+                triggerTime: '2023-06-14 16:45',
+                status: 'processing',
+                statusText: '处理中',
+                responsiblePerson: '李主管',
+                description: '项目拆迁补偿费用已超出预算8%，主要原因是新增特殊户型补偿标准调整。',
+                suggestion: '请财务部门进行专项预算审核，并提交预算调整申请。',
+                relatedProject: 'PRJ-2023-0008',
+                projectName: '西区综合开发项目',
+                createdBy: '系统自动',
+                createdTime: '2023-06-14 16:45:12'
+            },
+            {
+                id: 'AL-2023-0023',
+                type: '文档缺失',
+                level: 'low',
+                levelText: '低级',
+                triggerTime: '2023-06-14 10:12',
+                status: 'resolved',
+                statusText: '已处理',
+                responsiblePerson: '张总监',
+                description: '项目缺少必要的环境影响评估报告和居民意见征集表。',
+                suggestion: '请尽快补充相关文档，并上传至系统。',
+                relatedProject: 'PRJ-2023-0015',
+                projectName: '南湖区安置房项目',
+                createdBy: '系统自动',
+                createdTime: '2023-06-14 10:12:33',
+                resolvedBy: '张总监',
+                resolvedTime: '2023-06-14 15:30:22',
+                resolution: '已补充所有缺失文档并完成审核'
+            }
+        ],
+        // 显示预警详情
+        showAlertDetail(alert) {
+            this.currentAlert = alert;
+            this.showAlertDetailModal = true;
+        },
+        resetForm() {
+            this.ruleForm = {
+                name: '',
+                condition: '',
+                level: 'medium',
+                type: 'deadline',
+                notifyMethods: ['system'],
+                responsiblePerson: '',
+                advanceDays: 7,
+                description: '',
+                autoProcess: false
+            };
+        },
+        submitForm() {
+            // 这里可以添加表单验证逻辑
+            if (!this.ruleForm.name) {
+                alert('请输入规则名称');
+                return;
+            }
+            
+            // 模拟提交成功
+            setTimeout(() => {
+                alert('预警规则创建成功！');
+                this.showCreateRuleModal = false;
+                this.resetForm();
+            }, 500);
+        }
+    }">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边栏 -->
+        <div class="bg-primary-dark text-white w-64 flex-shrink-0 hidden md:block sidebar" id="sidebar">
+            <div class="p-4 border-b border-primary">
+                <h1 class="text-xl font-bold">征迁补偿系统</h1>
+            </div>
+            <nav class="mt-5">
+                <a href="dashboard.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>控制台</span>
+                </a>
+                <a href="projects.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-project-diagram mr-3"></i>
+                    <span>项目管理</span>
+                </a>
+                <a href="compensation.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-calculator mr-3"></i>
+                    <span>补偿标准</span>
+                </a>
+                <a href="applications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>申请处理</span>
+                </a>
+                <a href="reports.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>统计报表</span>
+                </a>
+                <a href="alerts.html" class="flex items-center py-3 px-4 bg-primary">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    <span>预警管理</span>
+                </a>
+                <a href="notifications.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-bell mr-3"></i>
+                    <span>通知中心</span>
+                </a>
+                <a href="settings.html" class="flex items-center py-3 px-4 hover:bg-primary transition duration-150">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-neutral-dark mr-4 md:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">预警管理</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="relative mr-4">
+                            <button class="text-neutral-dark hover:text-primary focus:outline-none">
+                                <i class="fas fa-bell"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-accent"></span>
+                            </button>
+                        </div>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-neutral-dark hover:text-primary focus:outline-none">
+                                <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/32.jpg" alt="用户头像">
+                                <span class="ml-2 hidden md:block">管理员</span>
+                                <i class="fas fa-chevron-down ml-1 hidden md:block"></i>
+                            </button>
+                            <!-- 用户下拉菜单 -->
+                            <div x-show="open" @click.away="open = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[99999]" style="display: none;">
+                                <!-- 用户状态信息 -->
+                                <div class="px-4 py-2 border-b border-neutral">
+                                    <p class="text-sm font-medium text-neutral-dark">管理员</p>
+                                    <p class="text-xs text-neutral">admin@example.com</p>
+                                    <div class="flex items-center mt-1">
+                                        <span class="h-2 w-2 rounded-full bg-green-500 mr-1"></span>
+                                        <span class="text-xs text-green-500">在线</span>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-user mr-2"></i> 个人资料
+                                </a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-cog mr-2"></i> 系统设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-neutral-dark hover:bg-neutral-light hover:text-primary transition-colors duration-150">
+                                    <i class="fas fa-bell mr-2"></i> 通知设置
+                                </a>
+                                <div class="border-t border-neutral mt-1"></div>
+                                <a href="login.html" class="block px-4 py-2 text-sm text-red-500 hover:bg-neutral-light transition-colors duration-150">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> 退出登录
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-4 md:p-6">
+                <!-- 预警概览 -->
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-neutral-dark">预警概览</h2>
+                            <p class="text-neutral-dark text-sm">当前系统预警状态一览</p>
+                        </div>
+                        <div class="hidden md:flex space-x-2">
+                            <button @click="showCreateRuleModal = true" class="bg-primary text-white hover:bg-primary-dark py-2 px-4 rounded-md transition duration-300 flex items-center text-sm">
+                                <i class="fas fa-plus mr-2"></i> 新建预警规则
+                            </button>
+                            <button class="border border-primary text-primary hover:bg-primary hover:text-white py-2 px-4 rounded-md transition duration-300 flex items-center text-sm">
+                                <i class="fas fa-file-export mr-2"></i> 导出预警报表
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-alert-high bg-opacity-10 rounded-md p-3 flex items-center">
+                            <i class="fas fa-exclamation-circle text-alert-high text-xl mr-3"></i>
+                            <div>
+                                <p class="text-xs text-neutral-dark">高级预警</p>
+                                <p class="text-lg font-semibold text-alert-high">5</p>
+                            </div>
+                        </div>
+                        <div class="bg-alert-medium bg-opacity-10 rounded-md p-3 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-alert-medium text-xl mr-3"></i>
+                            <div>
+                                <p class="text-xs text-neutral-dark">中级预警</p>
+                                <p class="text-lg font-semibold text-alert-medium">12</p>
+                            </div>
+                        </div>
+                        <div class="bg-alert-low bg-opacity-10 rounded-md p-3 flex items-center">
+                            <i class="fas fa-exclamation text-alert-low text-xl mr-3"></i>
+                            <div>
+                                <p class="text-xs text-neutral-dark">低级预警</p>
+                                <p class="text-lg font-semibold text-alert-low">24</p>
+                            </div>
+                        </div>
+                        <div class="bg-green-100 rounded-md p-3 flex items-center">
+                            <i class="fas fa-check-circle text-green-600 text-xl mr-3"></i>
+                            <div>
+                                <p class="text-xs text-neutral-dark">已处理</p>
+                                <p class="text-lg font-semibold text-green-600">18</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 新建预警规则模态框 -->
+                <div x-show="showCreateRuleModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+                    <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto" @click.away="showCreateRuleModal = false">
+                        <div class="p-4 border-b border-neutral flex justify-between items-center sticky top-0 bg-white z-10">
+                            <h3 class="text-lg font-medium text-neutral-dark">新建预警规则</h3>
+                            <button @click="showCreateRuleModal = false" class="text-neutral-dark hover:text-red-500">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-5">
+                            <!-- 预警类型选择 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-2">预警类型</label>
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                                    <template x-for="type in ruleTypes" :key="type.id">
+                                        <button 
+                                            @click="ruleForm.type = type.id"
+                                            :class="{
+                                                'border-primary bg-primary-light bg-opacity-10': ruleForm.type === type.id,
+                                                'border-neutral hover:border-primary': ruleForm.type !== type.id
+                                            }"
+                                            class="flex flex-col items-center justify-center p-3 border rounded-md transition duration-200">
+                                            <i :class="'fas fa-' + type.icon + ' text-xl ' + (ruleForm.type === type.id ? 'text-primary' : 'text-neutral-dark')"></i>
+                                            <span x-text="type.name" class="mt-1 text-xs"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- 基本信息 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="ruleName" class="block text-sm font-medium text-neutral-dark mb-1">规则名称 <span class="text-red-500">*</span></label>
+                                    <input type="text" id="ruleName" x-model="ruleForm.name" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent" placeholder="例如：合同到期预警">
+                                </div>
+                                <div>
+                                    <label for="alertLevel" class="block text-sm font-medium text-neutral-dark mb-1">预警级别</label>
+                                    <select id="alertLevel" x-model="ruleForm.level" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent bg-white">
+                                        <option value="high">高级 (红色)</option>
+                                        <option value="medium">中级 (橙色)</option>
+                                        <option value="low">低级 (黄色)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 触发条件 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-1">触发条件</label>
+                                <div class="border border-neutral rounded-md p-4 bg-neutral-light bg-opacity-50">
+                                    <!-- 截止日期预警特有设置 -->
+                                    <div x-show="ruleForm.type === 'deadline'" class="space-y-3">
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-neutral-dark mr-2">提前</span>
+                                            <input type="number" x-model="ruleForm.advanceDays" min="1" max="365" class="w-16 px-2 py-1 border border-neutral rounded-md focus:outline-none focus:ring-1 focus:ring-primary-light focus:border-transparent text-center">
+                                            <span class="text-sm text-neutral-dark ml-2">天触发预警</span>
+                                        </div>
+                                        <div class="text-xs text-neutral-dark bg-white p-2 rounded border border-neutral border-dashed">
+                                            <i class="fas fa-info-circle text-primary mr-1"></i> 系统将在项目截止日期前 <span x-text="ruleForm.advanceDays"></span> 天自动触发预警通知
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 预算超支预警特有设置 -->
+                                    <div x-show="ruleForm.type === 'budget'" class="space-y-3">
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-neutral-dark mr-2">当预算使用超过</span>
+                                            <select class="px-2 py-1 border border-neutral rounded-md focus:outline-none focus:ring-1 focus:ring-primary-light focus:border-transparent">
+                                                <option>80%</option>
+                                                <option>85%</option>
+                                                <option>90%</option>
+                                                <option>95%</option>
+                                            </select>
+                                            <span class="text-sm text-neutral-dark ml-2">时触发预警</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 自定义预警条件 -->
+                                    <div x-show="ruleForm.type === 'custom'">
+                                        <textarea x-model="ruleForm.condition" rows="3" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent" placeholder="描述触发此预警的具体条件，例如：合同剩余时间小于30天"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 通知设置 -->
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-dark mb-2">通知设置</label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm text-neutral-dark mb-1">通知方式</label>
+                                        <div class="space-y-1">
+                                            <label class="flex items-center">
+                                                <input type="checkbox" x-model="ruleForm.notifyMethods" value="system" class="form-checkbox h-4 w-4 text-primary focus:ring-primary-light border-neutral rounded">
+                                                <span class="ml-2 text-sm text-neutral-dark">系统内通知</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" x-model="ruleForm.notifyMethods" value="email" class="form-checkbox h-4 w-4 text-primary focus:ring-primary-light border-neutral rounded">
+                                                <span class="ml-2 text-sm text-neutral-dark">邮件通知</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" x-model="ruleForm.notifyMethods" value="sms" class="form-checkbox h-4 w-4 text-primary focus:ring-primary-light border-neutral rounded">
+                                                <span class="ml-2 text-sm text-neutral-dark">短信通知</span>
+                                            </label>
+                                            <label class="flex items-center">
+                                                <input type="checkbox" x-model="ruleForm.notifyMethods" value="wechat" class="form-checkbox h-4 w-4 text-primary focus:ring-primary-light border-neutral rounded">
+                                                <span class="ml-2 text-sm text-neutral-dark">微信通知</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="responsiblePerson" class="block text-sm text-neutral-dark mb-1">负责人</label>
+                                        <select id="responsiblePerson" x-model="ruleForm.responsiblePerson" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent bg-white">
+                                            <option value="">请选择负责人</option>
+                                            <option value="王经理">王经理</option>
+                                            <option value="李主管">李主管</option>
+                                            <option value="张总监">张总监</option>
+                                            <option value="赵工程师">赵工程师</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 高级设置 -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <label class="block text-sm font-medium text-neutral-dark">高级设置</label>
+                                    <button type="button" class="text-xs text-primary hover:text-primary-dark focus:outline-none">
+                                        <i class="fas fa-cog mr-1"></i> 更多设置
+                                    </button>
+                                </div>
+                                <div class="border border-neutral rounded-md p-4 space-y-3">
+                                    <div>
+                                        <label for="ruleDescription" class="block text-sm text-neutral-dark mb-1">规则描述</label>
+                                        <textarea id="ruleDescription" x-model="ruleForm.description" rows="2" class="w-full px-3 py-2 border border-neutral rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-transparent" placeholder="补充说明此预警规则的用途和注意事项"></textarea>
+                                    </div>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" x-model="ruleForm.autoProcess" class="form-checkbox h-4 w-4 text-primary focus:ring-primary-light border-neutral rounded">
+                                        <span class="ml-2 text-sm text-neutral-dark">启用自动处理（符合条件时自动执行预设操作）</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 border-t border-neutral flex justify-between items-center sticky bottom-0 bg-white z-10">
+                            <div class="text-xs text-neutral-dark">
+                                <i class="fas fa-info-circle mr-1"></i> 带 <span class="text-red-500">*</span> 为必填项
+                            </div>
+                            <div class="flex space-x-2">
+                                <button @click="showCreateRuleModal = false; resetForm();" class="border border-neutral text-neutral-dark hover:bg-neutral-light py-2 px-4 rounded-md transition duration-300 text-sm">
+                                    <i class="fas fa-times mr-1"></i> 取消
+                                </button>
+                                <button @click="submitForm()" class="bg-primary text-white hover:bg-primary-dark py-2 px-4 rounded-md transition duration-300 text-sm">
+                                    <i class="fas fa-check mr-1"></i> 创建规则
+                                </button> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预警列表 -->
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-medium text-neutral-dark">预警列表</h3>
+                            <p class="text-xs text-neutral-dark mt-1"><i class="fas fa-info-circle mr-1"></i> 提示：双击行可查看预警详情</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="relative">
+                                <input type="text" placeholder="搜索预警..." class="border border-neutral rounded-md py-1 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral"></i>
+                            </div>
+                            <select class="border border-neutral rounded-md py-1 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                <option>全部预警</option>
+                                <option>高级预警</option>
+                                <option>中级预警</option>
+                                <option>低级预警</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-neutral">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3 bg-neutral-light text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">ID</th>
+                                    <th class="px-4 py-3 bg-neutral-light text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">预警类型</th>
+                                    <th class="px-4 py-3 bg-neutral-light text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">预警级别</th>
+                                    <th class="px-4 py-3 bg-neutral-light text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">触发时间</th>
+                                    <th class="px-4 py-3 bg-neutral-light text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">状态</th>
+                                    <th class="px-4 py-3 bg-neutral-light text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">负责人</th>
+                                    <th class="px-4 py-3 bg-neutral-light text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-neutral">
+                                <template x-for="alert in alertData" :key="alert.id">
+                                    <tr class="hover:bg-neutral-light cursor-pointer" @dblclick="showAlertDetail(alert)">
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-neutral-dark" x-text="alert.id"></td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-neutral-dark" x-text="alert.type"></td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
+                                                  :class="{
+                                                    'bg-red-100 text-alert-high': alert.level === 'high',
+                                                    'bg-orange-100 text-alert-medium': alert.level === 'medium',
+                                                    'bg-yellow-100 text-alert-low': alert.level === 'low'
+                                                  }" 
+                                                  x-text="alert.levelText"></span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-neutral-dark" x-text="alert.triggerTime"></td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" 
+                                                  :class="{
+                                                    'bg-yellow-100 text-yellow-800': alert.status === 'pending',
+                                                    'bg-blue-100 text-blue-800': alert.status === 'processing',
+                                                    'bg-green-100 text-green-800': alert.status === 'resolved'
+                                                  }" 
+                                                  x-text="alert.statusText"></span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-neutral-dark" x-text="alert.responsiblePerson"></td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                                            <button @click.stop="showAlertDetail(alert)" class="text-primary hover:text-primary-light mr-2" title="查看详情"><i class="fas fa-eye"></i></button>
+                                            <button @click.stop class="text-accent hover:text-accent-secondary mr-2" title="编辑预警"><i class="fas fa-edit"></i></button>
+                                            <button @click.stop class="text-green-600 hover:text-green-700" title="标记为已处理"><i class="fas fa-check-circle"></i></button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="text-sm text-neutral-dark">
+                            显示 1 至 3 条，共 41 条
+                        </div>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 rounded border border-neutral text-neutral-dark hover:bg-neutral-light">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="px-3 py-1 rounded border border-primary bg-primary text-white">1</button>
+                            <button class="px-3 py-1 rounded border border-neutral text-neutral-dark hover:bg-neutral-light">2</button>
+                            <button class="px-3 py-1 rounded border border-neutral text-neutral-dark hover:bg-neutral-light">3</button>
+                            <button class="px-3 py-1 rounded border border-neutral text-neutral-dark hover:bg-neutral-light">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 预警分析和数据可视化 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- 预警趋势分析 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-neutral-dark">预警趋势分析</h3>
+                            <div class="flex space-x-2">
+                                <button id="monthlyBtn" class="trend-btn text-xs px-2 py-1 rounded bg-primary text-white transition duration-200">月度</button>
+                                <button id="quarterlyBtn" class="trend-btn text-xs px-2 py-1 rounded text-neutral-dark hover:bg-neutral-light transition duration-200">季度</button>
+                                <button id="yearlyBtn" class="trend-btn text-xs px-2 py-1 rounded text-neutral-dark hover:bg-neutral-light transition duration-200">年度</button>
+                            </div>
+                        </div>
+                        <div>
+                            <canvas id="alertTrendChart" height="200"></canvas>
+                        </div>
+                        <div class="mt-4 grid grid-cols-3 gap-4">
+                            <div class="text-center">
+                                <p class="text-sm text-neutral-dark">高级预警</p>
+                                <p class="text-xl font-semibold text-alert-high high-alert-total">32</p>
+                                <p class="text-xs text-neutral">较上期 <span class="text-red-500 high-alert-change">+15%</span></p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-neutral-dark">中级预警</p>
+                                <p class="text-xl font-semibold text-alert-medium medium-alert-total">78</p>
+                                <p class="text-xs text-neutral">较上期 <span class="text-red-500 medium-alert-change">+8%</span></p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-sm text-neutral-dark">低级预警</p>
+                                <p class="text-xl font-semibold text-alert-low low-alert-total">124</p>
+                                <p class="text-xs text-neutral">较上期 <span class="text-green-500 low-alert-change">-5%</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 预警分布 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-neutral-dark">预警分布</h3>
+                            <div class="flex space-x-2">
+                                <button id="projectBtn" class="distribution-btn text-xs px-2 py-1 rounded bg-primary text-white transition duration-200">项目</button>
+                                <button id="regionBtn" class="distribution-btn text-xs px-2 py-1 rounded text-neutral-dark hover:bg-neutral-light transition duration-200">区域</button>
+                                <button id="typeBtn" class="distribution-btn text-xs px-2 py-1 rounded text-neutral-dark hover:bg-neutral-light transition duration-200">类型</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div id="alertDistributionChart" style="height: 250px;"></div>
+                        </div>
+                        <div class="mt-3 text-xs text-neutral-dark text-center">
+                            <p id="distributionDescription">按项目类型统计的预警分布情况</p>
+                        </div>
+                    </div>
+
+                    <!-- 预警监控 -->
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-neutral-dark">实时监控</h3>
+                            <button id="refreshMonitoringChart" class="text-primary hover:text-primary-light text-sm">
+                                <i class="fas fa-sync-alt mr-1"></i> 刷新
+                            </button>
+                        </div>
+                        <div>
+                            <div id="alertMonitoringChart" style="height: 250px;"></div>
+                        </div>
+                        <div class="mt-3 text-xs text-neutral-dark text-center">
+                            <p>最近24小时预警触发频率</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- 预警详情模态框 -->
+    <div x-show="showAlertDetailModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" style="display: none;">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto" @click.away="showAlertDetailModal = false">
+            <div class="p-4 border-b border-neutral flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-lg font-medium text-neutral-dark">预警详情</h3>
+                <button @click="showAlertDetailModal = false" class="text-neutral-dark hover:text-red-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-5" x-show="currentAlert">
+                <!-- 预警基本信息 -->
+                <div class="flex flex-col md:flex-row md:items-start md:justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-3">
+                            <h4 class="text-xl font-semibold text-neutral-dark" x-text="currentAlert?.type"></h4>
+                            <span class="ml-3 px-2 py-1 text-xs font-semibold rounded-full" 
+                                  :class="{
+                                    'bg-red-100 text-alert-high': currentAlert?.level === 'high',
+                                    'bg-orange-100 text-alert-medium': currentAlert?.level === 'medium',
+                                    'bg-yellow-100 text-alert-low': currentAlert?.level === 'low'
+                                  }" 
+                                  x-text="currentAlert?.levelText"></span>
+                        </div>
+                        <p class="text-sm text-neutral-dark mb-1">预警ID: <span class="font-medium" x-text="currentAlert?.id"></span></p>
+                        <p class="text-sm text-neutral-dark mb-1">关联项目: <span class="font-medium" x-text="currentAlert?.projectName + ' (' + currentAlert?.relatedProject + ')'"></span></p>
+                        <p class="text-sm text-neutral-dark">负责人: <span class="font-medium" x-text="currentAlert?.responsiblePerson"></span></p>
+                    </div>
+                    <div class="mt-4 md:mt-0 md:ml-6 md:text-right">
+                        <p class="text-sm text-neutral-dark mb-1">触发时间: <span class="font-medium" x-text="currentAlert?.triggerTime"></span></p>
+                        <p class="text-sm text-neutral-dark mb-1">创建者: <span class="font-medium" x-text="currentAlert?.createdBy"></span></p>
+                        <p class="text-sm text-neutral-dark mb-3">状态: 
+                            <span class="px-2 py-0.5 text-xs font-semibold rounded-full" 
+                                  :class="{
+                                    'bg-yellow-100 text-yellow-800': currentAlert?.status === 'pending',
+                                    'bg-blue-100 text-blue-800': currentAlert?.status === 'processing',
+                                    'bg-green-100 text-green-800': currentAlert?.status === 'resolved'
+                                  }" 
+                                  x-text="currentAlert?.statusText"></span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 分隔线 -->
+                <div class="border-t border-neutral"></div>
+                
+                <!-- 预警详细描述 -->
+                <div>
+                    <h5 class="text-md font-medium text-neutral-dark mb-2">预警描述</h5>
+                    <div class="p-4 bg-neutral-light bg-opacity-50 rounded-md">
+                        <p class="text-sm text-neutral-dark" x-text="currentAlert?.description"></p>
+                    </div>
+                </div>
+                
+                <!-- 处理建议 -->
+                <div>
+                    <h5 class="text-md font-medium text-neutral-dark mb-2">处理建议</h5>
+                    <div class="p-4 bg-neutral-light bg-opacity-50 rounded-md">
+                        <p class="text-sm text-neutral-dark" x-text="currentAlert?.suggestion"></p>
+                    </div>
+                </div>
+                
+                <!-- 已处理信息 (仅当状态为已处理时显示) -->
+                <div x-show="currentAlert?.status === 'resolved'">
+                    <h5 class="text-md font-medium text-neutral-dark mb-2">处理结果</h5>
+                    <div class="p-4 bg-green-50 rounded-md border border-green-200">
+                        <p class="text-sm text-neutral-dark mb-2">处理人: <span class="font-medium" x-text="currentAlert?.resolvedBy"></span></p>
+                        <p class="text-sm text-neutral-dark mb-2">处理时间: <span class="font-medium" x-text="currentAlert?.resolvedTime"></span></p>
+                        <p class="text-sm text-neutral-dark">处理方式: <span x-text="currentAlert?.resolution"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t border-neutral flex justify-between items-center sticky bottom-0 bg-white z-10">
+                <div class="text-xs text-neutral-dark">
+                    <i class="fas fa-info-circle mr-1"></i> 双击预警列表项可快速查看详情
+                </div>
+                <div class="flex space-x-2">
+                    <button @click="showAlertDetailModal = false" class="border border-neutral text-neutral-dark hover:bg-neutral-light py-2 px-4 rounded-md transition duration-300 text-sm">
+                        <i class="fas fa-times mr-1"></i> 关闭
+                    </button>
+                    <button x-show="currentAlert?.status !== 'resolved'" class="bg-primary text-white hover:bg-primary-dark py-2 px-4 rounded-md transition duration-300 text-sm">
+                        <i class="fas fa-check mr-1"></i> 标记为已处理
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 新建预警规则模态框 -->
+    <div x-show="showModal" class="fixed inset-0 z-[100000] overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- 背景遮罩 -->
+            <div x-show="showModal" @click="showModal = false" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-neutral-dark opacity-50"></div>
+            </div>
+
+            <!-- 模态框内容 -->
+            <div x-show="showModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary-light bg-opacity-20 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-plus text-primary"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-neutral-dark">新建预警规
+
+    <!-- 图表初始化脚本 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 定义全局变量和数据
+            let trendChart = null;
+            let distributionChart = null;
+            let monitoringChart = null;
+            let currentDataType = 'project';
+            
+            // 预警趋势数据
+            const trendData = {
+                monthly: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '高级预警',
+                            data: [5, 8, 12, 8, 10, 5],
+                            borderColor: '#E53E3E',
+                            backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '中级预警',
+                            data: [10, 15, 18, 14, 12, 12],
+                            borderColor: '#DD6B20',
+                            backgroundColor: 'rgba(221, 107, 32, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '低级预警',
+                            data: [18, 22, 24, 20, 18, 24],
+                            borderColor: '#D69E2E',
+                            backgroundColor: 'rgba(214, 158, 46, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                quarterly: {
+                    labels: ['第一季度', '第二季度', '第三季度', '第四季度'],
+                    datasets: [
+                        {
+                            label: '高级预警',
+                            data: [25, 18, 22, 15],
+                            borderColor: '#E53E3E',
+                            backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '中级预警',
+                            data: [43, 38, 45, 32],
+                            borderColor: '#DD6B20',
+                            backgroundColor: 'rgba(221, 107, 32, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '低级预警',
+                            data: [64, 58, 72, 60],
+                            borderColor: '#D69E2E',
+                            backgroundColor: 'rgba(214, 158, 46, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                yearly: {
+                    labels: ['2020年', '2021年', '2022年', '2023年'],
+                    datasets: [
+                        {
+                            label: '高级预警',
+                            data: [45, 62, 58, 80],
+                            borderColor: '#E53E3E',
+                            backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '中级预警',
+                            data: [85, 110, 125, 158],
+                            borderColor: '#DD6B20',
+                            backgroundColor: 'rgba(221, 107, 32, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '低级预警',
+                            data: [120, 145, 180, 254],
+                            borderColor: '#D69E2E',
+                            backgroundColor: 'rgba(214, 158, 46, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                }
+            };
+            
+            // 统计数据
+            const statsData = {
+                monthly: {
+                    high: { total: 32, change: '+15%' },
+                    medium: { total: 78, change: '+8%' },
+                    low: { total: 124, change: '-5%' }
+                },
+                quarterly: {
+                    high: { total: 80, change: '+12%' },
+                    medium: { total: 158, change: '+5%' },
+                    low: { total: 254, change: '+2%' }
+                },
+                yearly: {
+                    high: { total: 245, change: '+22%' },
+                    medium: { total: 478, change: '+18%' },
+                    low: { total: 699, change: '+10%' }
+                }
+            };
+            
+            // 预警分布数据 - 按项目类型
+            const projectTypeData = {
+                series: [44, 30, 20, 6],
+                labels: ['道路建设', '水利工程', '城市更新', '其他项目'],
+                colors: ['#008679', '#00A896', '#3498DB', '#F39C12']
+            };
+            
+            // 预警分布数据 - 按区域
+            const regionData = {
+                series: [35, 25, 18, 12, 10],
+                labels: ['东部区域', '西部区域', '南部区域', '北部区域', '中心区域'],
+                colors: ['#008679', '#00A896', '#3498DB', '#F39C12', '#9B59B6']
+            };
+            
+            // 预警分布数据 - 按类型
+            const alertTypeData = {
+                series: [40, 25, 20, 15],
+                labels: ['项目延期', '预算超支', '文档缺失', '审批滞留'],
+                colors: ['#E53E3E', '#DD6B20', '#D69E2E', '#3498DB']
+            };
+            
+            // 初始化趋势图表
+            function initTrendChart(timeRange) {
+                const trendCtx = document.getElementById('alertTrendChart').getContext('2d');
+                
+                if (trendChart) {
+                    trendChart.destroy();
+                }
+                
+                trendChart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: trendData[timeRange],
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 500
+                        }
+                    }
+                });
+                
+                // 更新统计数据
+                updateTrendStats(timeRange);
+            }
+            
+            // 更新统计数据
+            function updateTrendStats(timeRange) {
+                const stats = statsData[timeRange];
+                
+                document.querySelector('.high-alert-total').textContent = stats.high.total;
+                document.querySelector('.medium-alert-total').textContent = stats.medium.total;
+                document.querySelector('.low-alert-total').textContent = stats.low.total;
+                
+                document.querySelector('.high-alert-change').textContent = stats.high.change;
+                document.querySelector('.medium-alert-change').textContent = stats.medium.change;
+                document.querySelector('.low-alert-change').textContent = stats.low.change;
+            }
+            
+            // 初始化分布图表
+            function initDistributionChart(dataType) {
+                let chartData;
+                
+                switch(dataType) {
+                    case 'project':
+                        chartData = projectTypeData;
+                        break;
+                    case 'region':
+                        chartData = regionData;
+                        break;
+                    case 'type':
+                        chartData = alertTypeData;
+                        break;
+                    default:
+                        chartData = projectTypeData;
+                }
+                
+                distributionChart = new ApexCharts(document.querySelector('#alertDistributionChart'), {
+                    series: chartData.series,
+                    chart: {
+                        type: 'donut',
+                        height: 250,
+                        events: {
+                            dataPointSelection: function(event, chartContext, config) {
+                                const selectedLabel = config.w.config.labels[config.dataPointIndex];
+                                const selectedValue = config.w.config.series[config.dataPointIndex];
+                                showDetailedChart(selectedLabel, selectedValue, currentDataType);
+                            }
+                        }
+                    },
+                    labels: chartData.labels,
+                    colors: chartData.colors,
+                    legend: {
+                        position: 'bottom',
+                        fontSize: '12px',
+                        markers: {
+                            width: 12,
+                            height: 12,
+                            radius: 12
+                        },
+                        itemMargin: {
+                            horizontal: 10,
+                            vertical: 0
+                        }
+                    },
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '55%'
+                            }
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function(value) {
+                                return value + ' 个预警';
+                            }
+                        }
+                    },
+                    states: {
+                        hover: {
+                            filter: {
+                                type: 'darken',
+                                value: 0.9
+                            }
+                        },
+                        active: {
+                            filter: {
+                                type: 'darken',
+                                value: 0.5
+                            }
+                        }
+                    }
+                });
+                
+                distributionChart.render();
+                
+                // 更新描述文本
+                updateDistributionDescription(dataType);
+            }
+            
+            // 更新分布图表描述
+            function updateDistributionDescription(dataType) {
+                const descText = document.getElementById('distributionDescription');
+                switch(dataType) {
+                    case 'project':
+                        descText.textContent = '按项目类型统计的预警分布情况';
+                        break;
+                    case 'region':
+                        descText.textContent = '按区域统计的预警分布情况';
+                        break;
+                    case 'type':
+                        descText.textContent = '按类型统计的预警分布情况';
+                        break;
+                }
+            }
+            
+            // 显示详细图表
+            function showDetailedChart(label, value, dataType) {
+                // 创建模态框显示详细信息
+                const detailModal = document.createElement('div');
+                detailModal.className = 'fixed inset-0 z-[100001] overflow-y-auto';
+                detailModal.innerHTML = `
+                    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                            <div class="absolute inset-0 bg-neutral-dark opacity-50"></div>
+                        </div>
+                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                        <h3 class="text-lg leading-6 font-medium text-neutral-dark">${label} 预警详情</h3>
+                                        <div class="mt-4">
+                                            <div id="detailChart" style="height: 300px;"></div>
+                                            <div class="mt-4 grid grid-cols-2 gap-4">
+                                                <div class="bg-neutral-light p-3 rounded-md">
+                                                    <p class="text-sm font-medium">总预警数</p>
+                                                    <p class="text-xl font-bold text-primary">${value}</p>
+                                                </div>
+                                                <div class="bg-neutral-light p-3 rounded-md">
+                                                    <p class="text-sm font-medium">处理进度</p>
+                                                    <p class="text-xl font-bold text-accent">${Math.floor(Math.random() * 100)}%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-neutral-light px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                <button type="button" class="closeDetailModal w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
+                                    关闭
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(detailModal);
+                
+                // 生成详细图表数据
+                const detailData = {
+                    series: [{
+                        name: '预警数量',
+                        data: [Math.floor(Math.random() * 10) + 1, Math.floor(Math.random() * 15) + 5, Math.floor(Math.random() * 8) + 2]
+                    }],
+                    categories: ['高级预警', '中级预警', '低级预警']
+                };
+                
+                // 初始化详细图表
+                const detailChart = new ApexCharts(document.querySelector('#detailChart'), {
+                    series: detailData.series,
+                    chart: {
+                        type: 'bar',
+                        height: 300,
+                        toolbar: {
+                            show: false
+                        },
+                        animations: {
+                            enabled: true,
+                            easing: 'easeinout',
+                            speed: 800
+                        }
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            columnWidth: '55%',
+                            borderRadius: 4
+                        },
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    colors: ['#008679'],
+                    xaxis: {
+                        categories: detailData.categories
+                    },
+                    yaxis: {
+                        title: {
+                            text: '预警数量'
+                        }
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function (val) {
+                                return val + " 个预警";
+                            }
+                        }
+                    }
+                });
+                detailChart.render();
+                
+                // 关闭按钮事件
+                document.querySelector('.closeDetailModal').addEventListener('click', function() {
+                    document.body.removeChild(detailModal);
+                });
+            }
+            
+            // 初始化监控图表
+            function initMonitoringChart() {
+                monitoringChart = new ApexCharts(document.querySelector('#alertMonitoringChart'), {
+                    series: [{
+                        name: '预警数量',
+                        data: generateRandomData()
+                    }],
+                    chart: {
+                        type: 'area',
+                        height: 250,
+                        animations: {
+                            enabled: true,
+                            easing: 'easeinout',
+                            speed: 800
+                        },
+                        toolbar: {
+                            show: false
+                        }
+                    },
+                    colors: ['#008679'],
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 1,
+                            opacityFrom: 0.7,
+                            opacityTo: 0.2,
+                            stops: [0, 90, 100]
+                        }
+                    },
+                    dataLabels: {
+                        enabled: false
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 2
+                    },
+                    xaxis: {
+                        categories: Array.from({length: 24}, (_, i) => `${i}:00`)
+                    },
+                    tooltip: {
+                        x: {
+                            format: 'HH:mm'
+                        }
+                    }
+                });
+                monitoringChart.render();
+            }
+            
+            // 生成随机数据
+            function generateRandomData() {
+                const data = [];
+                for (let i = 0; i < 24; i++) {
+                    data.push({
+                        x: i + ':00',
+                        y: Math.floor(Math.random() * 10) + 1
+                    });
+                }
+                return data;
+            }
+            
+            // 初始化所有图表
+            initTrendChart('monthly');
+            initDistributionChart('project');
+            initMonitoringChart();
+            
+            // 添加趋势图表按钮事件监听
+            document.getElementById('monthlyBtn').addEventListener('click', function() {
+                setActiveTrendButton(this);
+                initTrendChart('monthly');
+            });
+            
+            document.getElementById('quarterlyBtn').addEventListener('click', function() {
+                setActiveTrendButton(this);
+                initTrendChart('quarterly');
+            });
+            
+            document.getElementById('yearlyBtn').addEventListener('click', function() {
+                setActiveTrendButton(this);
+                initTrendChart('yearly');
+            });
+            
+            // 设置活动趋势按钮
+            function setActiveTrendButton(activeBtn) {
+                document.querySelectorAll('.trend-btn').forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('text-neutral-dark', 'hover:bg-neutral-light');
+                });
+                
+                activeBtn.classList.remove('text-neutral-dark', 'hover:bg-neutral-light');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+            
+            // 添加分布图表按钮事件监听
+            document.getElementById('projectBtn').addEventListener('click', function() {
+                setActiveDistributionButton(this);
+                currentDataType = 'project';
+                updateDistributionChart(projectTypeData);
+            });
+            
+            document.getElementById('regionBtn').addEventListener('click', function() {
+                setActiveDistributionButton(this);
+                currentDataType = 'region';
+                updateDistributionChart(regionData);
+            });
+            
+            document.getElementById('typeBtn').addEventListener('click', function() {
+                setActiveDistributionButton(this);
+                currentDataType = 'type';
+                updateDistributionChart(alertTypeData);
+            });
+            
+            // 设置活动分布按钮
+            function setActiveDistributionButton(activeBtn) {
+                document.querySelectorAll('.distribution-btn').forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('text-neutral-dark', 'hover:bg-neutral-light');
+                });
+                
+                activeBtn.classList.remove('text-neutral-dark', 'hover:bg-neutral-light');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+            
+            // 更新分布图表
+            function updateDistributionChart(data) {
+                distributionChart.updateOptions({
+                    labels: data.labels,
+                    colors: data.colors
+                });
+                distributionChart.updateSeries(data.series);
+                updateDistributionDescription(currentDataType);
+            }
+            
+            // 添加监控图表刷新按钮事件
+            document.getElementById('refreshMonitoringChart').addEventListener('click', function() {
+                monitoringChart.updateSeries([{
+                    name: '预警数量',
+                    data: generateRandomData()
+                }]);
+            });
+        });
+    </script>
+</body>
+</html>
